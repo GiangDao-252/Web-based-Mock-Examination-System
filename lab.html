@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf8">
+    <meta name="viewpoint" content="width=device-with, initial -scale=1">
+    <title>Proposal CTQ Web</title>
+    <link rel="stylesheet" href="lab.css">
+</head>
+
+<body>
+    <header id="main-header">Web CTQ</header>
+    
+    <h1>Web-based Mock Examination System (Hệ thống Thi thử Trực tuyến Nền tảng Web) </h1>
+    <h3><strong>Khách hàng/Đối tượng áp dụng:</strong> Các trường THPT, Trung tâm Luyện thi THPTQG, cá nhân thí sinh tham dự kỳ thi THPTQG</h3>
+    <h3><strong>Người đề xuất:</strong> Người đề xuất: Cao Quý Đức, Đào Hương Giang, Lê Đức Minh</h3>
+    <nav>
+        <ol>
+            <li><a href=#overview>Tính Cấp thiết và Đặt Vấn đề (Rationale & Problem Statement)</a></li>
+            <li><a href=#objectives>Mục tiêu Dự án (Project Objectives)</a></li>
+            <li><a href=#system> Kiến trúc Hệ thống & Giải pháp Công nghệ (System Architecture & Technical Solutions)</a></li>
+        </ol>
+    </nav>
+
+    <main>
+        <section>
+            <h2>1. Tính Cấp thiết và Đặt Vấn đề (Rationale & Problem Statement)</h2>
+            <h3>1.1. Góc độ Chính sách & Tầm nhìn Quốc gia: Đón đầu Đề án Thi THPT trên máy tính (2026 - 2036)</h3>
+            <p class="highlight">Giáo dục Việt Nam đang bước vào một bước ngoặt lịch sử về chuyển đổi số. 
+                Theo công bố mới nhất vào tháng 07/2026, Bộ GD-ĐT đã hoàn thiện và trình Chính phủ 
+                Đề án tổ chức thi tốt nghiệp THPT trên máy tính giai đoạn 2026 - 2036. 
+                Đề án này nhấn mạnh nguyên tắc cốt lõi: 
+                <b>"Tự động hóa tối đa để giảm can thiệp chủ quan của con người, đồng thời duy trì cơ chế giám sát nghiêm ngặt bằng công nghệ."</b></p>
+            <p> Cụ thể, Bộ GD-ĐT định hướng áp dụng hàng loạt công nghệ tiên tiến vào hệ thống khảo thí quốc gia: 
+                ghi nhật ký toàn bộ thao tác, giám sát trạng thái máy thi, phát hiện dấu hiệu bất thường và 
+                ứng dụng AI để phân tích dữ liệu, rà soát hành vi.</p>
+            <p>Tuy nhiên, việc chuyển đổi từ thi giấy sang thi máy tính không thể diễn ra trong 
+                một sớm một chiều. Đa số học sinh THPT hiện nay chưa có kinh nghiệm làm bài thi 
+                chuẩn hóa trên nền tảng số với các quy định giám sát khắt khe. Do đó, các trường THPT 
+                và cơ sở giáo dục đang đối mặt với một áp lực lớn: Cần phải có ngay các công cụ mô phỏng 
+                chính xác môi trường thi trên máy tính của Bộ GD-ĐT để tổ chức thi thử định kỳ, giúp học 
+                sinh rèn luyện thao tác, làm quen với áp lực số hóa và chuẩn bị tâm lý vững vàng trước khi 
+                bước vào kỳ thi chuẩn hóa quốc gia đa đợt.</p>
+            <h3>1.2. Góc độ Sư phạm: Thách thức về "Điểm ảo" và sự toàn vẹn của dữ liệu đánh giá</h3>
+            <p>Trong quá trình chờ đợi cơ sở hạ tầng quốc gia hoàn thiện, các trường phổ thông đã và 
+                đang chủ động tổ chức thi thử trực tuyến. Tuy nhiên, tính vắng mặt của giám thị trực tiếp 
+                (physical proctor) đã tạo ra một lỗ hổng lớn về tính trung thực, dẫn đến những hệ lụy 
+                nghiêm trọng:</p>
+            <ul>
+                <li><strong>Sự bùng nổ của gian lận công nghệ cao:</strong> Học sinh dễ dàng sử dụng 
+                    các công cụ hỗ trợ giải bài tập tức thời. Việc mở tab ẩn danh để tra cứu, sử dụng 
+                    điện thoại thông minh quét câu hỏi qua các ứng dụng AI (như QANDA, Photomath), hoặc 
+                    trao đổi qua nhóm chat kín diễn ra phổ biến.</li>
+                <li><strong>Hệ lụy của "Điểm ảo" đối với chiến lược giảng dạy:</strong>Mục đích tối thượng
+                    của thi thử là cung cấp một bản "chẩn đoán" (diagnostic) chính xác về lỗ hổng kiến 
+                    thức. Khi học sinh đạt điểm cao nhờ gian lận, hệ thống đánh giá hoàn toàn bị vô hiệu 
+                    hóa. Giáo viên bị định hướng sai lệch bởi nguồn dữ liệu "ảo", dẫn đến việc xây dựng lộ
+                    trình ôn tập sai trọng tâm cho giai đoạn nước rút.</li>
+                <li><strong>Tâm lý ỷ lại:</strong>Môi trường thi thử lỏng lẻo sẽ dung túng cho thói quen 
+                    phụ thuộc tài liệu, khiến học sinh thất bại khi bước vào phòng thi thật và sự giám 
+                    sát của hệ thống máy tính từ Bộ GD-ĐT.</li>
+            </ul>
+            <h3>1.3. Góc độ Công nghệ: Khoảng trống giữa các nền tảng trong nước và giải pháp quốc tế</h3>
+            <p>Để giải quyết bài toán gian lận và mô phỏng lại hệ thống của Bộ GD-ĐT, công nghệ giám sát 
+                (Proctoring) là lời giải tất yếu. Tuy nhiên, khi áp dụng vào thực tiễn tại Việt Nam, 
+                chúng ta đang đối mặt với một khoảng trống lớn:</p>
+            <ul>
+                <li><strong>Các nền tảng khảo thí trong nước hiện tại quá sơ sài: </strong>Đa số các công 
+                    cụ (như Google Forms hay LMS cơ bản) chỉ làm nhiệm vụ phân phối câu hỏi. Các tính năng 
+                    chống gian lận (nếu có) chỉ dựa trên cơ chế bắt sự kiện trình duyệt (event-listener) 
+                    rất yếu, dễ dàng bị qua mặt.</li>
+                <li><strong>Sự cồng kềnh của các phần mềm Proctoring quốc tế:</strong>Các 
+                    giải pháp giám sát chuyên nghiệp (Proctorio, Respondus) thường yêu cầu 
+                    cài đặt phần mềm bên thứ ba can thiệp sâu vào hệ thống.</li>
+                    <ul>
+                        <li><strong>Rào cản về phần cứng:</strong> Các phần mềm này ép máy trạm 
+                            (client-side) phải chạy thuật toán phân tích nặng. Với điều kiện cơ sở vật 
+                            chất phân mảnh của học sinh Việt Nam (máy tính cũ, cấu hình thấp, mạng 
+                            không ổn định), điều này gây giật lag, treo máy và làm hỏng bài thi.</li>
+                        <li><strong>Rào cản về chi phí:</strong> Phí bản quyền ngoại tệ của các 
+                            giải pháp quốc tế vượt quá khả năng chi trả thường xuyên của các 
+                            trường THPT công lập.</li>
+                    </ul>
+            </ul>
+            <p><strong>Tiểu kết:</strong> Ngành giáo dục Việt Nam đang khát khao một nền tảng <b>Web-based Mock</b></p>
+            <p><b>Examination System</b>hoàn toàn bằng trình duyệt, không cần cài đặt phức tạp. 
+                Hệ thống này không chỉ giải quyết triệt để vấn nạn gian lận bằng AI Tracking tiên 
+                tiến (đáp ứng đúng tầm nhìn công nghệ của Bộ GD-ĐT), mà còn được tối ưu hóa luồng 
+                dữ liệu đám mây để hoạt động mượt mà trên mọi thiết bị yếu nhất của học sinh phổ 
+                thông.</p>   
+        </section>
+
+        <section id = "objectives">
+            <h2>2. Mục tiêu Dự án (Project Objectives)</h2>
+            <p>Dự án được thiết kế không chỉ để giải quyết bài toán giám sát, mà còn khai thác 
+                tối đa sức mạnh của dữ liệu để phục vụ công tác tư vấn tuyển sinh, cụ thể qua 3 
+                mục tiêu cốt lõi:</p>
+            <h3>2.1. Mục tiêu Khảo thí & Giáo dục (Educational & Assessment Objectives)</h3>
+            <ul>
+                <li><strong>Minh bạch hóa kết quả:</strong> Cung cấp một môi trường thi thử trực 
+                    tuyến nghiêm ngặt, triệt tiêu tối đa các hành vi gian lận (tra cứu tài liệu, 
+                    thi hộ) để đảm bảo điểm số thu được phản ánh chính xác 100% năng lực thực 
+                    chất của học sinh.</li>
+                <li><strong>Trải nghiệm tiệm cận kỳ thi quốc gia:</strong>Giúp học sinh làm quen 
+                    với giao diện, áp lực thời gian và quy chế thi trên máy tính, đón đầu lộ trình
+                    số hóa công tác khảo thí của Bộ GD-ĐT.</li>
+            </ul>
+            <h3>2.2. Mục tiêu Phân tích Dữ liệu & Tư vấn (Data Analytics & Counseling Objectives)</h3>
+            <p>Thay vì chỉ trả về một con số điểm đơn thuần, hệ thống chuyển hóa kết quả thi 
+                thành các báo cáo phân tích chuyên sâu (Personalized Reports), mang lại giá trị 
+                tham chiếu cao cho cả học sinh và giáo viên:</p>
+            <ul>
+                <li><strong>Định vị năng lực tương đối:</strong>Tự động tính toán và cung cấp vị 
+                    trí của thí sinh so với toàn bộ phổ điểm của đợt thi (hoặc dữ liệu mô phỏng 
+                    cả nước), thể hiện qua các chỉ số thống kê như: Điểm trung bình chung, 
+                    Tứ phân vị (Quartiles), và xếp hạng Percentile (thí sinh đang thuộc top 
+                    bao nhiêu % xuất sắc nhất).</li>
+                <li><strong>Tham chiếu điểm chuẩn Đại học:</strong>Tích hợp hệ thống cơ sở dữ liệu 
+                    điểm chuẩn lịch sử của các trường Đại học lớn. Dựa trên tổ hợp môn thi (khối thi)
+                    thí sinh đăng ký, hệ thống tự động đối chiếu và phân tích khả năng trúng tuyển, 
+                    từ đó giúp học sinh điều chỉnh nguyện vọng và chiến lược ôn tập kịp thời.</li>
+            </ul>
+            <h3>2.3. Mục tiêu Kỹ thuật & Hạ tầng (Technical & Infrastructure Objectives)</h3>
+            <ul>
+                <li><strong>Kiến trúc Web-based tinh gọn:</strong>Xây dựng nền tảng chỉ 
+                    chạy trên trình duyệt, không yêu cầu cài đặt, tối ưu hóa để hoạt động
+                    mượt mà trên mọi thiết bị máy tính cá nhân.</li>
+                <li><strong>Hệ sinh thái AI & Data Pipeline:</strong>
+                    <ul>
+                        <li>Tích hợp luồng xử lý học máy (Machine Learning) 
+                            để nhận diện tự động các hành vi bất thường, cảnh báo gian lận
+                            theo thời gian thực.</li>
+                        <li>Xây dựng module Phân tích Dữ liệu (Data Analytics) mạnh mẽ trên
+                            nền tảng đám mây (Cloud), có khả năng tổng hợp, tính toán phổ 
+                            điểm và xuất báo cáo thống kê cho hàng ngàn người dùng cùng lúc 
+                            mà không gây quá tải hệ thống.</li>
+                    </ul>
+                </li>
+            </ul> 
+        </section>
+
+        <section id="system">
+            <h2>3. Kiến trúc Hệ thống & Giải pháp Công nghệ (System Architecture & Technical Solutions)</h2>
+            <p>Hệ thống được triển khai hoàn toàn trên hạ tầng điện toán đám mây (Cloud Computing - dự kiến sử dụng AWS) với cơ chế tự động mở rộng (Auto-scaling), đảm bảo chịu tải cao trong các kỳ thi thử quy mô lớn. Kiến trúc cốt lõi được chia thành 3 phân hệ chính:</p>
+            
+            <h3>3.1. Phân hệ Giám sát Thời gian thực (Real-time AI Proctoring Pipeline)</h3>
+            <p>Để tránh tình trạng giật lag trên máy tính học sinh (Thin Client approach), luồng dữ liệu giám sát được thiết kế bất đồng bộ:</p>
+            <ul>
+                <li><strong>Data Ingestion:</strong> Giao diện trình duyệt của học sinh định kỳ chụp ảnh khung hình (webcam frames) và ghi nhận sự kiện (chuyển tab, di chuột, copy/paste), nén lại và gửi lên server dưới dạng luồng dữ liệu (data stream) thông qua WebSocket hoặc REST API.</li>
+                <li><strong>Message Queue (Hàng đợi thông điệp):</strong> Sử dụng các dịch vụ như Amazon SQS hoặc Apache Kafka để tiếp nhận hàng chục ngàn request gửi lên cùng lúc, tránh làm sập máy chủ.</li>
+                <li><strong>AI Processing Workers:</strong> Các luồng dữ liệu từ hàng đợi sẽ được đưa vào các server chạy mô hình Machine Learning (Computer Vision/Anomaly Detection). Nếu phát hiện bất thường (ví dụ: mất khuôn mặt, có điện thoại, có tiếng ồn lạ), hệ thống sẽ lập tức tạo ra một bản ghi cảnh báo (Flag) dán nhãn thời gian (Timestamp).</li>
+                <li><strong>Storage (Lưu trữ):</strong> Hình ảnh/video bằng chứng vi phạm được lưu trực tiếp vào Object Storage (Amazon S3), trong khi log cảnh báo được ghi vào cơ sở dữ liệu quan hệ (Amazon RDS) để hiển thị lên Live Dashboard cho giám thị.</li>
+            </ul>
+
+            <h3>3.2. Phân hệ Xử lý Thống kê & Phân tích Học tập (Analytics Data Pipeline & Ranking Module)</h3>
+            <p>Đây là "trái tim" của hệ thống đánh giá, chịu trách nhiệm xử lý điểm số và xuất báo cáo cá nhân hóa ngay sau khi kỳ thi kết thúc. Luồng xử lý được thiết kế theo quy trình ETL (Extract - Transform - Load) tiêu chuẩn:</p>
+            <ul>
+                <li><strong>Bảng điểm gốc (Raw Data):</strong> Khi học sinh nộp bài, điểm số thô của từng môn thi sẽ được lưu vào cơ sở dữ liệu giao dịch (Transactional DB).</li>
+                <li><strong>Module Tính toán (Data Processing Engine):</strong> Sử dụng các thư viện phân tích dữ liệu chuyên sâu (như Pandas/NumPy của Python) kết hợp với các hàm SQL phân tích (Window Functions) để xử lý một lượng lớn dữ liệu cùng lúc.</li>
+                <li><strong>Tính toán Tứ phân vị (Quartiles) & Phổ điểm:</strong> Hệ thống tự động phân nhóm điểm số toàn cụm thi để vẽ biểu đồ phân phối chuẩn (Histogram). Tính toán các mốc Q1 (25%), Q2 (Trung vị - 50%), Q3 (75%) để học sinh biết mình đang ở phân khúc nào của phổ điểm.</li>
+                <li><strong>Xếp hạng Percentile (Top % cả nước/cụm thi):</strong> Sử dụng thuật toán tính hạng phần trăm (PERCENT_RANK()). Ví dụ: Nếu học sinh A đạt Percentile 90%, hệ thống sẽ tự động xuất báo cáo: "Bạn có điểm số cao hơn 90% tổng số thí sinh tham gia đợt thi này".</li>
+                <li><strong>Module Tham chiếu Điểm chuẩn (Admission Benchmarking):</strong>
+                    <ul>
+                        <li>Hệ thống duy trì một Cơ sở dữ liệu lịch sử (Historical DB) lưu trữ điểm chuẩn của các trường Đại học trong 3-5 năm gần nhất.</li>
+                        <li>Khi có điểm thi thử, hệ thống tự động tổng hợp điểm theo Tổ hợp môn (Khối A00, A01, D01, v.v.). Sau đó, thuật toán sẽ đối chiếu (mapping) điểm tổng hợp của học sinh với cơ sở dữ liệu điểm chuẩn để đưa ra danh sách: (1) Các trường/ngành an toàn, (2) Các trường/ngành vừa sức, và (3) Các trường/ngành rủi ro cao.</li>
+                    </ul>
+                </li>
+                <li><strong>Lớp bộ nhớ đệm (Caching Layer):</strong> Để hàng ngàn học sinh tra cứu phổ điểm và thứ hạng cùng lúc mà không làm treo server, các kết quả thống kê tổng thể (như biểu đồ phổ điểm chung) sẽ được lưu vào bộ nhớ đệm (Amazon ElastiCache / Redis). Khi học sinh tải trang, hệ thống chỉ cần lấy dữ liệu từ Cache thay vì phải tính toán lại từ đầu.</li>
+            </ul>
+
+            <h3>3.3. Phân hệ Giao diện & Bảo mật Client-side (Frontend & Security)</h3>
+            <ul>
+                <li><strong>Browser Lockdown (Khóa trình duyệt):</strong> Sử dụng các API của trình duyệt (Fullscreen API, Page Visibility API, Clipboard API) để ngăn học sinh thoát khỏi chế độ toàn màn hình, chặn mở tab mới, và vô hiệu hóa hoàn toàn lệnh Copy/Paste/Print screen.</li>
+                <li><strong>Offline-Tolerance (Cơ chế chịu lỗi mạng):</strong> Trình duyệt tích hợp tính năng Local Storage. Nếu mạng nhà học sinh bị rớt đột ngột, bài làm và log thao tác vẫn được lưu tạm trên máy. Khi có kết nối lại, hệ thống sẽ tự động đồng bộ (sync) lên server đám mây, đảm bảo không mất bài của thí sinh.</li>
+            </ul>
+
+            <p><em>* Việc tách bạch rõ ràng giữa luồng AI Proctoring (xử lý hình ảnh nặng, thời gian thực) và luồng Data Analytics (xử lý số liệu, tính toán batch) trong proposal sẽ cho Ban giám khảo/Khách hàng thấy tư duy hệ thống sắc bén và am hiểu sâu sắc về kiến trúc ứng dụng quy mô lớn.</em></p>
+
+            <figure style="text-align: center; margin-top: 30px;">
+                <img src="flow.png" alt="Sơ đồ Kiến trúc Hệ thống Web-based Mock Examination System"
+                alt="description"
+                width="800ptx">
+                <figcaption style="font-style: italic; margin-top: 10px; color: #555;">Hình: Sơ đồ Kiến trúc Hệ thống (System Architecture Diagram)</figcaption>
+            </figure>
+        </section>
+
+        <section id="features">
+            <h2>4. Tính năng Cốt lõi (Core Features)</h2>
+            <p>Hệ thống được thiết kế theo triết lý "Lấy người dùng làm trung tâm", phân tách rõ ràng hai luồng trải nghiệm: Tối đa hóa sự tập trung cho học sinh và Tối ưu hóa năng lực giám sát cho giáo viên.</p>
+            
+            <h3>4.1. Phân hệ Dành cho Học sinh (Môi trường Làm bài Cấp cao)</h3>
+            <p>Thay vì tạo ra cảm giác bị theo dõi, giao diện thi được thiết kế để trở thành một "phòng thi ảo" khép kín, cung cấp đầy đủ công cụ để học sinh không có bất kỳ lý do gì phải thoát ra ngoài.</p>
+            <ul>
+                <li><strong>Môi trường Thi Khép kín (Browser Lockdown & Secure UI):</strong>
+                    <ul>
+                        <li>Ép buộc trình duyệt hoạt động ở chế độ Toàn màn hình (Full-screen). Bất kỳ nỗ lực thoát khỏi toàn màn hình nào đều bị hệ thống ghi log và cảnh báo.</li>
+                        <li>Vô hiệu hóa hoàn toàn các phím tắt sao chép/dán (Ctrl+C, Ctrl+V), chụp màn hình (Print Screen), và ngăn chặn việc click chuột phải để gọi công cụ Inspect Element (F12).</li>
+                        <li>Tự động phát hiện và cảnh báo nếu hệ thống ghi nhận máy tính đang kết nối với màn hình thứ hai (Dual-monitor) nhằm chống việc nhờ người khác xem hộ đề.</li>
+                    </ul>
+                </li>
+                <li><strong>Cơ chế Chịu lỗi Mạng (Offline-Tolerance & Auto-sync):</strong>
+                    <ul>
+                        <li>Bài làm được lưu liên tục tĩnh (Auto-save) vào Local Storage của trình duyệt.</li>
+                        <li>Trong trường hợp đường truyền mạng tại nhà học sinh bị đứt đột ngột, hệ thống không văng ra ngoài mà cho phép học sinh tiếp tục làm bài ở chế độ Offline tạm thời. Khi có mạng trở lại, một luồng dữ liệu mã hóa sẽ tự động đồng bộ (sync) toàn bộ quá trình làm bài lên server đám mây, giúp học sinh không bị áp lực mất bài do sự cố khách quan.</li>
+                    </ul>
+                </li>
+                <li><strong>Báo cáo Năng lực Cá nhân hóa (Personalized Post-Exam Report):</strong>
+                    <ul>
+                        <li>Ngay khi kết thúc bài thi, học sinh nhận được báo cáo điểm số chi tiết kèm theo vị trí của mình trên phổ điểm chung (Tứ phân vị - Quartile, Top %).</li>
+                        <li>Cung cấp dự báo trúng tuyển dựa trên việc đối chiếu khối thi của học sinh với cơ sở dữ liệu điểm chuẩn Đại học lịch sử.</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>4.2. Phân hệ Dành cho Giáo viên/Giám thị (Trung tâm Điều hành Khảo thí)</h3>
+            <p>Giao diện quản lý được thiết kế để giải phóng sức lao động cho giám thị. Thay vì phải căng mắt nhìn chằm chằm vào hàng chục camera, hệ thống AI sẽ đóng vai trò "người gác cổng", chỉ gọi giám thị khi có vấn đề.</p>
+            <ul>
+                <li><strong>Bảng Điều khiển Thời gian thực (Live Proctoring Dashboard):</strong>
+                    <ul>
+                        <li>Cung cấp góc nhìn toàn cảnh (Bird's-eye view) về trạng thái phòng thi: Tổng số thí sinh đang trực tuyến, số thí sinh bị mất kết nối mạng, tiến độ làm bài (đã làm được bao nhiêu %).</li>
+                        <li>Giao diện quản lý danh sách học sinh theo dạng lưới (Grid-view), cho phép giám thị click vào bất kỳ học sinh nào để xem trực tiếp luồng webcam và màn hình làm bài của em đó ngay thời điểm hiện tại.</li>
+                    </ul>
+                </li>
+                <li><strong>Hệ thống Cắm cờ Thông minh bằng AI (AI-Powered Smart Flagging):</strong>
+                    <p>Các luồng video gửi về server không cần giám thị xem thủ công mà được AI tự động quét và phân loại mức độ nghi ngờ theo quy tắc đèn giao thông (Traffic-light system):</p>
+                    <ul>
+                        <li>🟢 <strong>Cờ Xanh (Bình thường):</strong> Khung hình có một khuôn mặt duy nhất, ánh mắt tập trung vào màn hình.</li>
+                        <li>🟡 <strong>Cờ Vàng (Cảnh báo nhẹ):</strong> Học sinh liên tục liếc mắt khỏi màn hình (nghi ngờ nhìn tài liệu), có tiếng ồn lạ trong nền, hoặc góc mặt bị tối/khuất một phần.</li>
+                        <li>🔴 <strong>Cờ Đỏ (Vi phạm nghiêm trọng):</strong> Phát hiện có người thứ hai xuất hiện trong camera, phát hiện vật thể lạ (điện thoại thông minh), hoặc học sinh rời khỏi khung hình quá 15 giây.</li>
+                    </ul>
+                    <p>Mỗi "Cờ" đều được đính kèm một Timestamp (Dấu thời gian) và một Ảnh chụp/Video clip 3 giây làm bằng chứng (được kéo từ hệ thống lưu trữ Amazon S3). Giám thị chỉ cần lướt qua bảng danh sách Cờ Đỏ để xác nhận vi phạm và quyết định đình chỉ/trừ điểm chỉ bằng một cú click.</p>
+                </li>
+                <li><strong>Báo cáo Thống kê Phân tích Đề thi (Item Analysis Report):</strong>
+                    <ul>
+                        <li>Cung cấp cho giáo viên dữ liệu về "Độ khó" và "Độ phân biệt" của đề thi. Ví dụ: Phát hiện tự động câu số 35 có đến 80% học sinh giỏi làm sai, giúp giáo viên rà soát lại xem đề có bị lỗi hoặc học sinh đang hổng kiến thức ở mảng nào để kịp thời bồi dưỡng.</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+    </main>
+
+    <section id="timeline">
+        <h2>5. Lộ trình Triển khai Dự kiến (Implementation Timeline)</h2>
+        <p>Dự án dự kiến được triển khai trong vòng 6 tháng, chia thành 4 giai đoạn với phương pháp quản lý Agile để đảm bảo tiến độ và khả năng thích ứng linh hoạt.</p>
+
+        <h3>Giai đoạn 1: Khảo sát, Thiết kế và Kiến trúc Hạ tầng (2 tuần)</h3>
+        <ul>
+            <li><strong>Thiết kế Dữ liệu & Hệ thống:</strong> Hoàn thiện sơ đồ kiến trúc đám mây (Cloud Topology) trên AWS. Chuẩn hóa Lược đồ cơ sở dữ liệu (SQL Schemas) và ERD cho dữ liệu điểm số, log hành vi và điểm chuẩn lịch sử.</li>
+            <li><strong>Thiết kế Trải nghiệm (UI/UX):</strong> Lên mockup chi tiết cho Giao diện phòng thi khép kín của học sinh và Live Dashboard của giáo viên.</li>
+            <li><strong>Bảo mật:</strong> Thiết lập mạng riêng ảo (VPC) và phân quyền truy cập (IAM) nghiêm ngặt cho các nhóm phát triển.</li>
+        </ul>
+
+        <h3>Giai đoạn 2: Phát triển Cốt lõi & Xây dựng MVP (4 tuần)</h3>
+        <ul>
+            <li><strong>Frontend & Client-side:</strong> Lập trình trình duyệt thi độc lập (Browser Lockdown), tích hợp các công cụ ảo (máy tính giả lập, giấy nháp) và xây dựng cơ chế Auto-save Offline-Tolerance dưới Local Storage.</li>
+            <li><strong>Backend & Cơ sở dữ liệu:</strong> Thiết lập Amazon RDS để lưu trữ dữ liệu giao dịch (điểm thi). Cấu hình API Gateway và luồng luân chuyển dữ liệu bài thi.</li>
+            <li><strong>Storage:</strong> Đấu nối hệ thống với Amazon S3 để sẵn sàng lưu trữ dữ liệu hình ảnh/video bằng chứng.</li>
+        </ul>
+
+        <h3>Giai đoạn 3: Tích hợp AI Proctoring & Data Analytics (4 tuần)</h3>
+        <p>Đây là giai đoạn trọng điểm, đưa các mô hình Khoa học Dữ liệu vào hệ thống.</p>
+        <ul>
+            <li><strong>Module AI Proctoring:</strong> Huấn luyện và đóng gói (containerize) các mô hình Computer Vision nhận diện khuôn mặt và thiết bị vi phạm. Tích hợp luồng xử lý bất đồng bộ qua Message Queue để hệ thống tự động cắm cờ (Smart Flagging) theo thời gian thực mà không làm gián đoạn máy học sinh.</li>
+            <li><strong>Module Analytics & Ranking:</strong> Viết các tập lệnh (scripts) bằng Python và SQL nâng cao để xử lý dữ liệu hàng loạt (Batch Processing). Xây dựng thuật toán tính toán Tứ phân vị, Percentile Rank và tự động đối chiếu điểm thi với Cơ sở dữ liệu điểm chuẩn.</li>
+        </ul>
+
+        <h3>Giai đoạn 4: Kiểm thử, Tối ưu hóa và Vận hành Thử nghiệm (1 tuần)</h3>
+        <ul>
+            <li><strong>Kiểm thử Chịu tải (Stress-testing):</strong> Giả lập luồng truy cập của 5.000 - 10.000 học sinh cùng lúc (cùng gửi video webcam và nộp bài) để kiểm tra khả năng Auto-scaling của máy chủ.</li>
+            <li><strong>Pilot (Thử nghiệm thực tế):</strong> Phối hợp với 1-2 trường THPT đối tác để tổ chức thi thử nghiệm cho khối 12.</li>
+            <li><strong>Tinh chỉnh (Fine-tuning):</strong> Dựa trên dữ liệu thực tế, tinh chỉnh lại độ nhạy của mô hình AI để giảm tỷ lệ nhận diện nhầm (false positives) và hoàn thiện các báo cáo thống kê.</li>
+        </ul>
+    </section>
+
+    <section id="budget">
+        <h2>6. Ngân sách & Phân bổ Tài nguyên (Budget & Resource Allocation)</h2>
+        <p>Dự án yêu cầu sự phối hợp của một đội ngũ kỹ thuật chuyên sâu và nguồn lực hạ tầng linh hoạt. Để tối ưu hóa dòng tiền, ngân sách được chia làm hai khoản chính: Chi phí phát triển ban đầu (CAPEX) và Chi phí vận hành duy trì (OPEX).</p>
+        
+        <h3>6.1. Đội ngũ Nhân sự (Nhóm Nghiên cứu Phát triển - CAPEX)</h3>
+        <p>Việc phân bổ nhân sự sẽ được tính theo định mức tháng công (Man-month) trong vòng 6 tháng triển khai dự án:</p>
+        <table border="1" style="border-collapse: collapse; width: 100%; margin: 15px 0;">
+            <thead>
+                <tr style="background-color: #f2f2f2; text-align: left;">
+                    <th style="padding: 10px;">Vị trí / Vai trò</th>
+                    <th style="padding: 10px;">Trách nhiệm cốt lõi</th>
+                    <th style="padding: 10px;">Định mức dự kiến</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 10px;"><strong>Trưởng dự án / Cố vấn chuyên môn</strong></td>
+                    <td style="padding: 10px;">Chịu trách nhiệm về định hướng sư phạm, chuẩn hóa quy trình khảo thí, thiết kế logic tính điểm/xếp hạng và quản trị rủi ro dự án.</td>
+                    <td style="padding: 10px;">Bán thời gian (Part-time)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><strong>Kỹ sư Khoa học Dữ liệu (Data Scientist)</strong></td>
+                    <td style="padding: 10px;">Huấn luyện mô hình AI (Computer Vision) giám sát gian lận; phát triển thuật toán phân tích phổ điểm (Percentile) và dự báo trúng tuyển.</td>
+                    <td style="padding: 10px;">Toàn thời gian (Full-time)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><strong>Kỹ sư Cloud & Backend</strong></td>
+                    <td style="padding: 10px;">Thiết lập hạ tầng đám mây (AWS), tối ưu hóa cơ sở dữ liệu quan hệ, xây dựng Data Pipeline luân chuyển dữ liệu bài thi.</td>
+                    <td style="padding: 10px;">Toàn thời gian (Full-time)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><strong>Kỹ sư Frontend</strong></td>
+                    <td style="padding: 10px;">Thiết kế UI/UX, phát triển giao diện web khóa trình duyệt (Browser Lockdown), tích hợp cơ chế lưu nháp Offline-Tolerance.</td>
+                    <td style="padding: 10px;">Toàn thời gian (Full-time)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>6.2. Dự toán Chi phí Hạ tầng Kỹ thuật (OPEX - Cloud Infrastructure)</h3>
+        <p>Hệ thống tận dụng triệt để hệ sinh thái điện toán đám mây để đảm bảo khả năng mở rộng (Auto-scaling). Chi phí được tối ưu theo mô hình "Dùng bao nhiêu trả bấy nhiêu" (Pay-as-you-go), chỉ tăng cao vào các ngày tổ chức thi thử diện rộng.</p>
+        <ul>
+            <li><strong>Chi phí Lưu trữ & Cơ sở dữ liệu (Storage & Database):</strong>
+                <ul>
+                    <li><strong>Amazon RDS:</strong> Trụ cột lưu trữ dữ liệu giao dịch (điểm số, thông tin học sinh, bộ đề thi). Đảm bảo tính nhất quán (ACID) không để xảy ra sai sót điểm.</li>
+                    <li><strong>Amazon S3:</strong> Phân lớp lưu trữ hiệu quả chi phí. Sử dụng S3 Standard cho các hình ảnh/video bằng chứng mới nhất cần truy xuất nhanh; và tự động chuyển dữ liệu cũ sang S3 Glacier để lưu trữ dài hạn với giá cực rẻ.</li>
+                </ul>
+            </li>
+            <li><strong>Chi phí Tính toán & Xử lý (Compute & Processing):</strong>
+                <ul>
+                    <li><strong>Amazon EC2 (với Auto Scaling):</strong> Máy chủ chạy các mô hình AI giám sát. Tự động tăng số lượng máy chủ (Scale-out) khi có hàng ngàn học sinh truy cập cùng lúc và tự động tắt (Scale-in) khi kỳ thi kết thúc để tiết kiệm ngân sách.</li>
+                    <li><strong>AWS Lambda (Serverless):</strong> Xử lý các tác vụ ngầm nhỏ lẻ (như gửi email báo cáo điểm cho học sinh, đồng bộ dữ liệu) giúp triệt tiêu chi phí máy chủ chạy không (idle).</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>6.3. Các chi phí Vận hành khác</h3>
+        <ul>
+            <li><strong>Tên miền (Domain) & Chứng chỉ Bảo mật (SSL):</strong> Đảm bảo website thi chạy trên giao thức HTTPS an toàn, mã hóa toàn bộ luồng dữ liệu truyền tải giữa học sinh và hệ thống.</li>
+            <li><strong>Dịch vụ Nhắn tin/Email (Amazon SES):</strong> Gửi mã OTP xác thực đăng nhập và gửi trực tiếp "Báo cáo Năng lực Cá nhân hóa" (Personalized Report) về email của học sinh ngay sau khi nộp bài.</li>
+        </ul>
+    </section>
+
+    <section id="risk-management">
+        <h2>7. Quản trị Rủi ro & Đạo đức Dữ liệu (Risk Management & Data Ethics)</h2>
+        <p>Trong bối cảnh công nghệ giáo dục (EdTech) ngày càng phát triển, việc ứng dụng Trí tuệ Nhân tạo vào đánh giá năng lực phải đi đôi với trách nhiệm bảo vệ dữ liệu người học. Dự án cam kết thực thi các tiêu chuẩn khắt khe nhất về đạo đức dữ liệu và quản trị rủi ro thông qua 3 trụ cột chính:</p>
+        
+        <h3>7.1. Bảo mật Quyền riêng tư (Data Privacy & Security)</h3>
+        <p>Dữ liệu phát sinh trong quá trình thi (bao gồm thông tin cá nhân, hình ảnh khuôn mặt, âm thanh môi trường và lịch sử thao tác) được xếp vào nhóm dữ liệu cực kỳ nhạy cảm. Hệ thống thiết lập hàng rào bảo mật nhiều lớp:</p>
+        <ul>
+            <li><strong>Mã hóa toàn trình (End-to-end Encryption):</strong> Toàn bộ dữ liệu truyền tải giữa trình duyệt của học sinh và máy chủ được mã hóa qua giao thức SSL/TLS (In-transit). Dữ liệu lưu trữ trên cơ sở dữ liệu và hệ thống lưu trữ object đều được mã hóa tại chỗ (At-rest) bằng các tiêu chuẩn công nghiệp (như AES-256 thông qua hệ thống quản lý khóa KMS).</li>
+            <li><strong>Vòng đời dữ liệu khép kín (Automated Data Lifecycle):</strong> Thay vì xóa thủ công (tiềm ẩn rủi ro con người), hệ thống thiết lập các quy tắc vòng đời tự động (ví dụ: S3 Lifecycle rules). Toàn bộ hình ảnh, video giám sát và log hành vi sẽ bị xóa vĩnh viễn (auto-purge) khỏi hệ thống đúng 30 ngày sau khi kỳ thi kết thúc và mọi khiếu nại đã được giải quyết.</li>
+            <li><strong>Phân quyền truy cập nghiêm ngặt:</strong> Áp dụng nguyên tắc "Quyền truy cập tối thiểu" (Principle of Least Privilege). Chỉ những giám thị được phân công phụ trách phòng thi cụ thể mới có quyền truy cập vào luồng cảnh báo và hình ảnh của phòng thi đó.</li>
+        </ul>
+
+        <h3>7.2. Đạo đức AI và Cơ chế "Human-in-the-loop"</h3>
+        <p>Mọi mô hình Machine Learning đều tồn tại biên độ sai số (False Positives/False Negatives). Việc phó mặc quyết định kỷ luật cho máy móc đi ngược lại các nguyên tắc giáo dục nhân văn. Do đó, hệ thống được thiết kế theo tư duy "AI làm trợ lý, Con người làm chủ":</p>
+        <ul>
+            <li><strong>AI chỉ cắm cờ (Smart Flagging):</strong> AI đóng vai trò như một màng lọc dữ liệu tốc độ cao, chỉ thực hiện nhiệm vụ phát hiện điểm bất thường (nhận diện thiết bị lạ, khuôn mặt bị khuất) và lưu lại bằng chứng kèm dấu thời gian (timestamp).</li>
+            <li><strong>Giáo viên ra quyết định (Final Human Judgment):</strong> Quyết định cuối cùng về việc cảnh cáo, đình chỉ thi hay trừ điểm hoàn toàn thuộc về giám thị. Hệ thống cung cấp giao diện trực quan để giám thị có thể xem lại đoạn video 3-5 giây tại thời điểm bị AI "cắm cờ" trước khi đưa ra phán quyết. Điều này bảo vệ học sinh khỏi những đánh giá sai lệch của máy móc (ví dụ: học sinh cúi xuống nháp bài bị AI nhận diện nhầm là đang nhìn tài liệu).</li>
+        </ul>
+
+        <h3>7.3. Đảm bảo Công bằng về Kỹ thuật (Technical Equity)</h3>
+        <ul>
+            <li><strong>Rủi ro phân hóa thiết bị:</strong> Không phải học sinh nào cũng có điều kiện sở hữu máy tính cấu hình cao hoặc đường truyền internet cáp quang. Nếu hệ thống giám sát quá nặng, học sinh máy yếu sẽ bị thiệt thòi về thời gian và tâm lý.</li>
+            <li><strong>Giải pháp:</strong> Kiến trúc Web-based và xử lý bất đồng bộ (đẩy dữ liệu nặng lên đám mây) đảm bảo trải nghiệm thi mượt mà, công bằng cho mọi thí sinh, bất kể các em đang dùng thiết bị đời cũ hay đời mới.</li>
+        </ul>
+    </section>
+
+    <section id="demo-cards">
+
+    </section>
+
+    <footer>
+        <p>© 2026 Web CTQ</p>
+    </footer>
+</body>
+</html>

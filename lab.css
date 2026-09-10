@@ -1,0 +1,36 @@
+h1{
+    color: red;
+    font-size: 40px;
+}
+
+.highlight {
+    background-color: #fff3cd; 
+    border-left: 5px solid #ffc107; 
+    padding: 15px;
+    margin: 15px 0;
+    font-weight: 500;
+    color: #856404;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+header {
+    color: blue; 
+    font-size: 20px;
+}
+
+#main-header {
+    color: red; 
+    font-size: 28px;
+    font-weight: bold;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #e74c3c; 
+    text-decoration: underline;
+}
