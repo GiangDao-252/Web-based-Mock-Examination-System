@@ -43,7 +43,7 @@ Hệ thống triển khai 100% trên nền tảng Điện toán đám mây (Clou
 
 ---
 
-##  Lộ trình Triển khai (6 Tháng - Agile)
+##  Lộ trình Triển khai
 
 - [x] **Giai đoạn 1 (2 tuần):** Khảo sát, Thiết kế UI/UX, Kiến trúc Cloud (VPC, IAM, Lược đồ DB).
 - [ ] **Giai đoạn 2 (4 tuần):** Phát triển MVP Cốt lõi (Frontend Browser Lockdown, cơ chế Offline-Tolerance, API luân chuyển bài thi).
@@ -52,7 +52,7 @@ Hệ thống triển khai 100% trên nền tảng Điện toán đám mây (Clou
 
 ---
 
-## 👥 Đội ngũ Đề xuất
+## Thành viên
 *   **Cao Quý Đức**
 *   **Đào Hương Giang** 
 *   **Đoàn Công Tân**
