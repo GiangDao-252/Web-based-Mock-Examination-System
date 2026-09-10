@@ -1,4 +1,4 @@
-# Web CTQ - Web-based Mock Examination System 🎓
+# Web CTQ - Web-based Mock Examination System 
 
 [![Status](https://img.shields.io/badge/Status-Proposal-blue.svg)]()
 [![Platform](https://img.shields.io/badge/Platform-Web--based-lightgrey.svg)]()
