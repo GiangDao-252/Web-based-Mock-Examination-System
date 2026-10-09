@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Proposal — Web-based Mock Examination System</title>
+
+    <link rel="stylesheet" href="lab.css">
+</head>
+
+<body>
+    <header id="main-header">Web CTQ</header>
+
+    <h1>
+        Web-based Mock Examination System
+        — Hệ thống thi thử trực tuyến dành cho học sinh
+    </h1>
+
+    <p>
+        <strong>Đối tượng sử dụng:</strong>
+        Học sinh và cá nhân có nhu cầu tự luyện tập,
+        tự tạo hoặc tải đề lên để thi thử trên trình duyệt.
+    </p>
+
+    <p>
+        <strong>Nhóm đề xuất:</strong>
+        Đào Hương Giang, Đoàn Công Tân
+    </p>
+
+    <nav aria-label="Mục lục proposal">
+        <ol>
+            <li><a href="#overview">Tính cấp thiết và đặt vấn đề</a></li>
+            <li><a href="#objectives">Mục tiêu dự án</a></li>
+            <li><a href="#system">Kiến trúc và giải pháp công nghệ</a></li>
+            <li><a href="#features">Tính năng cốt lõi</a></li>
+            <li><a href="#timeline">Lộ trình triển khai</a></li>
+            <li><a href="#budget">Nguồn lực và chi phí</a></li>
+            <li><a href="#risk-management">Rủi ro và bảo vệ dữ liệu</a></li>
+        </ol>
+    </nav>
+
+    <main>
+        <section id="overview">
+            <h2>1. Tính cấp thiết và đặt vấn đề</h2>
+
+            <h3>1.1. Nhu cầu tự luyện thi trên nền tảng số</h3>
+
+            <p>
+                Học sinh cần một công cụ giúp luyện tập với đề thi,
+                quản lý thời gian và theo dõi kết quả ngay trên trình duyệt.
+                Việc tự luyện thi cần thuận tiện trên máy tính,
+                máy tính bảng và điện thoại.
+            </p>
+
+            <p>
+                Ngoài sử dụng đề có sẵn, học sinh có nhu cầu tải đề của mình
+                lên hệ thống, chỉnh sửa nội dung và thực hiện nhiều lượt
+                luyện tập để đánh giá tiến bộ.
+            </p>
+
+            <h3>1.2. Những khó khăn trong quá trình tự học</h3>
+
+            <ul>
+                <li>
+                    <strong>Đề thi phân tán:</strong>
+                    Đề được lưu ở nhiều nơi, khó tìm kiếm và quản lý.
+                </li>
+
+                <li>
+                    <strong>Thiếu công cụ làm bài:</strong>
+                    Việc luyện tập từ tài liệu thông thường không có
+                    đồng hồ, bảng chuyển câu hoặc chức năng đánh dấu xem lại.
+                </li>
+
+                <li>
+                    <strong>Khó theo dõi tiến bộ:</strong>
+                    Học sinh cần lưu lịch sử làm bài và xem lại
+                    những câu đúng, sai hoặc chưa trả lời.
+                </li>
+
+                <li>
+                    <strong>Dễ mất tập trung:</strong>
+                    Việc chuyển sang tab hoặc ứng dụng khác trong lúc
+                    làm bài có thể làm gián đoạn quá trình luyện tập.
+                </li>
+
+                <li>
+                    <strong>Nguy cơ mất bài:</strong>
+                    Tải lại trang hoặc mất kết nối có thể khiến
+                    học sinh mất đáp án đang làm nếu không có lưu nháp.
+                </li>
+            </ul>
+
+            <h3>1.3. Giải pháp đề xuất</h3>
+
+            <p>
+                Xây dựng hệ thống thi thử trên trình duyệt dành cho học sinh,
+                kết hợp quản lý đề cá nhân, làm bài có giới hạn thời gian,
+                lưu tiến độ và báo cáo kết quả.
+            </p>
+
+            <p>
+                Hệ thống giữ chức năng giám sát ở mức theo dõi trạng thái
+                trang thi: ghi nhận số lần trang bị ẩn và hiển thị lại
+                thông tin đó cho chính học sinh.
+                Phạm vi hiện tại không bao gồm giám sát bằng camera,
+                microphone hoặc mô hình AI.
+            </p>
+        </section>
+
+        <section id="objectives">
+            <h2>2. Mục tiêu dự án</h2>
+
+            <h3>2.1. Hỗ trợ tự luyện tập</h3>
+
+            <ul>
+                <li>
+                    Cung cấp giao diện làm bài có đồng hồ,
+                    bảng điều hướng câu hỏi và chức năng đánh dấu xem lại.
+                </li>
+
+                <li>
+                    Cho phép học sinh tự tải đề lên,
+                    kiểm tra nội dung và quản lý các đề của mình.
+                </li>
+
+                <li>
+                    Chấm tự động các câu trắc nghiệm một đáp án
+                    theo đáp án đúng đã được khai báo trong đề.
+                </li>
+
+                <li>
+                    Hiển thị kết quả và lịch sử làm bài
+                    để học sinh theo dõi tiến bộ.
+                </li>
+            </ul>
+
+            <h3>2.2. Hỗ trợ tự đánh giá mức độ tập trung</h3>
+
+            <ul>
+                <li>
+                    Hiển thị số lần rời trang thi được trình duyệt ghi nhận
+                    trong quá trình làm bài.
+                </li>
+
+                <li>
+                    Ghi nhận thời điểm trang bị ẩn và thời điểm quay lại
+                    khi có đủ sự kiện tương ứng.
+                </li>
+
+                <li>
+                    Tổng hợp thông tin giám sát trong báo cáo sau bài thi.
+                </li>
+
+                <li>
+                    Không tự động trừ điểm hoặc kết luận gian lận
+                    dựa trên số lần rời trang.
+                </li>
+            </ul>
+
+            <h3>2.3. Mục tiêu kỹ thuật</h3>
+
+            <ul>
+                <li>
+                    Phát triển frontend bằng HTML, CSS và JavaScript.
+                </li>
+
+                <li>
+                    Thiết kế responsive cho máy tính,
+                    máy tính bảng và điện thoại.
+                </li>
+
+                <li>
+                    Xây dựng backend để quản lý tài khoản, đề thi,
+                    bài làm và kết quả.
+                </li>
+
+                <li>
+                    Hỗ trợ lưu nháp và khôi phục bài đang làm;
+                    đồng bộ dữ liệu khi kết nối được phục hồi.
+                </li>
+
+                <li>
+                    Bảo vệ dữ liệu cá nhân và kiểm tra quyền sở hữu
+                    khi người dùng sửa hoặc xóa đề.
+                </li>
+            </ul>
+        </section>
+
+        <section id="system">
+            <h2>3. Kiến trúc hệ thống và giải pháp công nghệ</h2>
+
+            <p>
+                Hệ thống gồm giao diện trình duyệt, backend API
+                và cơ sở dữ liệu. Giai đoạn đầu ưu tiên kiến trúc đơn giản,
+                phù hợp với quy mô thử nghiệm của nhóm.
+                Hạ tầng đám mây được lựa chọn khi triển khai thực tế.
+            </p>
+
+            <h3>3.1. Frontend</h3>
+
+            <ul>
+                <li>
+                    <strong>HTML:</strong>
+                    Xây dựng cấu trúc các trang xác thực,
+                    trang cá nhân, tải đề, làm bài và kết quả.
+                </li>
+
+                <li>
+                    <strong>CSS:</strong>
+                    Thiết kế giao diện nhất quán và responsive,
+                    hỗ trợ nội dung dài và thao tác trên màn hình cảm ứng.
+                </li>
+
+                <li>
+                    <strong>JavaScript:</strong>
+                    Xử lý nhập đề, điều hướng câu hỏi, đáp án,
+                    cờ xem lại, đồng hồ, lưu nháp và giám sát trạng thái trang.
+                </li>
+            </ul>
+
+            <h3>3.2. Backend và cơ sở dữ liệu</h3>
+
+            <p>
+                Backend dự kiến sử dụng Python với FastAPI;
+                cơ sở dữ liệu dự kiến sử dụng PostgreSQL.
+                Backend chịu trách nhiệm xác thực, kiểm tra dữ liệu
+                và lưu trữ kết quả chính thức.
+            </p>
+
+            <ul>
+                <li>
+                    <strong>Tài khoản:</strong>
+                    Lưu thông tin người dùng và mật khẩu đã băm.
+                </li>
+
+                <li>
+                    <strong>Đề thi:</strong>
+                    Lưu chủ sở hữu, tiêu đề, thời lượng,
+                    câu hỏi, lựa chọn và đáp án đúng.
+                </li>
+
+                <li>
+                    <strong>Lượt làm bài:</strong>
+                    Lưu phiên bản đề, thời điểm bắt đầu,
+                    thời hạn kết thúc và trạng thái nộp.
+                </li>
+
+                <li>
+                    <strong>Đáp án và kết quả:</strong>
+                    Lưu lựa chọn của học sinh, điểm số
+                    và số câu đúng, sai, chưa trả lời.
+                </li>
+
+                <li>
+                    <strong>Nhật ký tập trung:</strong>
+                    Lưu các sự kiện trang bị ẩn và quay lại
+                    gắn với từng lượt làm bài.
+                </li>
+            </ul>
+
+            <p>
+                Backend kiểm tra quyền sở hữu ở mỗi thao tác sửa hoặc xóa.
+                Việc ẩn nút trên frontend không thay thế kiểm tra quyền
+                truy cập ở máy chủ.
+            </p>
+
+            <h3>3.3. Nhập và quản lý đề thi</h3>
+
+            <p>
+                Giai đoạn đầu hỗ trợ đề trắc nghiệm một đáp án
+                bằng file JSON theo cấu trúc thống nhất.
+                Học sinh có thể xem trước và chỉnh sửa nội dung
+                trước khi lưu đề.
+            </p>
+
+            <ul>
+                <li>
+                    Kiểm tra tiêu đề, thời lượng,
+                    danh sách câu hỏi và các lựa chọn.
+                </li>
+
+                <li>
+                    Kiểm tra mỗi câu có một đáp án đúng
+                    thuộc danh sách lựa chọn của câu đó.
+                </li>
+
+                <li>
+                    Thông báo rõ vị trí dữ liệu thiếu hoặc không hợp lệ.
+                </li>
+
+                <li>
+                    Hiển thị nội dung tải lên dưới dạng văn bản,
+                    không thực thi HTML hoặc JavaScript trong file đề.
+                </li>
+
+                <li>
+                    Giới hạn kích thước file và số câu hỏi
+                    theo cấu hình của hệ thống.
+                </li>
+
+                <li>
+                    Khi đề được chỉnh sửa, lượt làm bài đã có
+                    vẫn gắn với phiên bản đề ban đầu.
+                </li>
+            </ul>
+
+            <p>
+                Nhập đề tự động từ PDF, Word hoặc ảnh
+                được xem là hướng mở rộng sau MVP.
+            </p>
+
+            <h3>3.4. Theo dõi số lần rời trang thi</h3>
+
+            <p>
+                Sử dụng Page Visibility API để theo dõi sự kiện
+                visibilitychange và trạng thái document.visibilityState.
+            </p>
+
+            <ul>
+                <li>
+                    Chỉ theo dõi trong thời gian lượt làm bài đang hoạt động.
+                </li>
+
+                <li>
+                    Mỗi lần trạng thái chuyển từ visible sang hidden
+                    được ghi nhận là một lần trang thi bị ẩn.
+                </li>
+
+                <li>
+                    Khi trang trở lại visible, cập nhật số lần đã ghi nhận
+                    và thông báo cho học sinh.
+                </li>
+
+                <li>
+                    Nếu có cả thời điểm rời và quay lại,
+                    tính khoảng thời gian trang bị ẩn.
+                </li>
+
+                <li>
+                    Dừng ghi nhận khi bài đã nộp hoặc hết thời gian.
+                    Chuyển sang trang kết quả sau đó không được tính.
+                </li>
+
+                <li>
+                    Nếu bổ sung blur và focus, các sự kiện này
+                    được lưu riêng dưới dạng mất và lấy lại tiêu điểm,
+                    không cộng trực tiếp vào số lần trang bị ẩn.
+                </li>
+            </ul>
+
+            <p>
+                Chỉ số này phản ánh các sự kiện trình duyệt quan sát được.
+                Hệ thống không xác định người dùng đã mở website nào,
+                không phát hiện mọi hoạt động ngoài trình duyệt
+                và không bảo đảm ghi nhận sự kiện cuối cùng
+                khi ứng dụng bị đóng đột ngột.
+            </p>
+
+            <h3>3.5. Thời gian, lưu nháp và đồng bộ</h3>
+
+            <ul>
+                <li>
+                    Đồng hồ được tính từ thời hạn kết thúc,
+                    không chỉ giảm biến đếm mỗi giây.
+                </li>
+
+                <li>
+                    Khi kết nối backend, máy chủ xác định thời hạn
+                    và kiểm tra thời điểm nhận bài.
+                </li>
+
+                <li>
+                    Lưu nháp đáp án, cờ xem lại, câu đang mở,
+                    thời hạn và nhật ký trạng thái trang
+                    theo mã lượt làm bài.
+                </li>
+
+                <li>
+                    Khôi phục tiến độ khi tải lại trang;
+                    không cấp lại toàn bộ thời gian làm bài.
+                </li>
+
+                <li>
+                    Khi mất mạng, tiếp tục làm phần đề đã tải đầy đủ
+                    nếu dữ liệu còn khả dụng trong trình duyệt.
+                </li>
+
+                <li>
+                    Khi kết nối trở lại, gửi dữ liệu chưa đồng bộ
+                    và hiển thị trạng thái xác nhận của máy chủ.
+                </li>
+
+                <li>
+                    Phân biệt rõ bài đã lưu trên thiết bị
+                    với bài đã được máy chủ nhận.
+                </li>
+            </ul>
+        </section>
+
+        <section id="features">
+            <h2>4. Tính năng cốt lõi</h2>
+
+            <p>
+                Hệ thống có một nhóm người dùng là học sinh.
+                Mỗi học sinh có thể quản lý đề cá nhân
+                và thực hiện các lượt luyện tập.
+                Không có giao diện giáo viên hoặc giám thị trong MVP.
+            </p>
+
+            <h3>4.1. Tài khoản và trang cá nhân</h3>
+
+            <ul>
+                <li>Đăng ký, đăng nhập và đăng xuất.</li>
+                <li>Khôi phục mật khẩu qua email và OTP khi có backend.</li>
+                <li>Xem và cập nhật thông tin cá nhân.</li>
+                <li>Xem danh sách đề và lịch sử luyện tập.</li>
+            </ul>
+
+            <h3>4.2. Tải đề và quản lý đề của tôi</h3>
+
+            <ul>
+                <li>Tải file đề theo định dạng được hỗ trợ.</li>
+                <li>Xem trước và chỉnh sửa nội dung đề.</li>
+                <li>Đặt tên đề và thời lượng làm bài.</li>
+                <li>Quản lý đáp án đúng để chấm bài tự động.</li>
+                <li>Sửa hoặc xóa đề thuộc quyền sở hữu của mình.</li>
+                <li>Bắt đầu luyện tập từ một đề đã lưu.</li>
+            </ul>
+
+            <h3>4.3. Giao diện làm bài</h3>
+
+            <ul>
+                <li>Hiển thị câu hỏi và các lựa chọn.</li>
+                <li>Chuyển câu bằng bảng số hoặc nút trước và tiếp.</li>
+                <li>Đổi màu số câu đã chọn đáp án.</li>
+                <li>Gắn hoặc bỏ cờ cho câu cần xem lại.</li>
+                <li>Hiển thị số câu đã trả lời.</li>
+                <li>Hiển thị đồng hồ và cảnh báo thời gian còn ít.</li>
+                <li>Xác nhận nộp bài khi còn câu chưa trả lời.</li>
+                <li>Kết thúc lượt làm bài khi hết thời gian.</li>
+                <li>Khóa thay đổi đáp án sau khi kết thúc.</li>
+            </ul>
+
+            <h3>4.4. Giám sát để tự đánh giá sự tập trung</h3>
+
+            <ul>
+                <li>
+                    Thông báo cách ghi nhận trước khi học sinh bắt đầu bài.
+                </li>
+
+                <li>
+                    Hiển thị chỉ số “Số lần rời trang thi được ghi nhận”
+                    ngay trong giao diện làm bài.
+                </li>
+
+                <li>
+                    Khi quay lại, hiển thị thông báo, ví dụ:
+                    “Trang thi đã bị ẩn 2 lần trong lượt làm bài này.”
+                </li>
+
+                <li>
+                    Cho phép xem số lần và thời gian ghi nhận
+                    trong báo cáo sau bài thi.
+                </li>
+
+                <li>
+                    Không chặn đổi tab, không tự động đình chỉ
+                    và không trừ điểm theo chỉ số giám sát.
+                </li>
+            </ul>
+
+            <h3>4.5. Kết quả và lịch sử luyện tập</h3>
+
+            <ul>
+                <li>
+                    Hiển thị điểm số dựa trên quy tắc chấm của đề.
+                </li>
+
+                <li>
+                    Thống kê câu đúng, sai và chưa trả lời.
+                </li>
+
+                <li>
+                    Hiển thị đáp án đã chọn và đáp án đúng sau bài làm.
+                </li>
+
+                <li>
+                    Hiển thị lời giải nếu người tạo đề cung cấp.
+                </li>
+
+                <li>
+                    Hiển thị trạng thái kết thúc và thông tin tập trung.
+                </li>
+
+                <li>
+                    So sánh các lượt luyện tập theo cùng đề
+                    hoặc cùng phiên bản đề.
+                </li>
+            </ul>
+
+            <h3>4.6. Hướng mở rộng về phân tích dữ liệu</h3>
+
+            <p>
+                Sau MVP, hệ thống có thể bổ sung biểu đồ tiến bộ,
+                phân tích theo chủ đề và thống kê các câu thường làm sai.
+            </p>
+
+            <p>
+                Phổ điểm, tứ phân vị và percentile chỉ được bổ sung
+                khi có nhóm dữ liệu so sánh phù hợp,
+                chẳng hạn các lượt làm cùng phiên bản đề và điều kiện.
+                Báo cáo phải nêu rõ nhóm tham chiếu,
+                không suy rộng thành thứ hạng toàn quốc.
+            </p>
+
+            <p>
+                Tham chiếu điểm chuẩn đại học là hướng mở rộng,
+                sử dụng dữ liệu có nguồn và năm công bố rõ ràng.
+                Kết quả đối chiếu chỉ mang tính tham khảo,
+                không được trình bày như dự báo chắc chắn trúng tuyển.
+            </p>
+        </section>
+
+        <section id="timeline">
+            <h2>5. Lộ trình triển khai dự kiến</h2>
+
+            <p>
+                Lộ trình tham khảo gồm 11 tuần,
+                chia thành bốn giai đoạn.
+                Tiến độ được điều chỉnh theo nguồn lực thực tế.
+            </p>
+
+            <h3>Giai đoạn 1: Phân tích và thiết kế — 2 tuần</h3>
+
+            <ul>
+                <li>Chốt phạm vi hệ thống chỉ dành cho học sinh.</li>
+                <li>Thiết kế giao diện và luồng sử dụng responsive.</li>
+                <li>Thống nhất cấu trúc file đề và quy tắc chấm.</li>
+                <li>Thiết kế dữ liệu tài khoản, đề, lượt làm và nhật ký.</li>
+                <li>Định nghĩa cách đếm số lần rời trang thi.</li>
+            </ul>
+
+            <h3>Giai đoạn 2: Phát triển chức năng cốt lõi — 4 tuần</h3>
+
+            <ul>
+                <li>Hoàn thiện giao diện xác thực và trang cá nhân.</li>
+                <li>Phát triển tải đề, xem trước và quản lý đề cá nhân.</li>
+                <li>Phát triển làm bài, chuyển câu, cờ và đồng hồ.</li>
+                <li>Xây dựng backend API và cơ sở dữ liệu.</li>
+                <li>Kiểm tra quyền sở hữu và dữ liệu đầu vào.</li>
+            </ul>
+
+            <h3>Giai đoạn 3: Tích hợp và hoàn thiện — 4 tuần</h3>
+
+            <ul>
+                <li>Kết nối xác thực và khôi phục mật khẩu với backend.</li>
+                <li>Tích hợp chấm bài, báo cáo và lịch sử luyện tập.</li>
+                <li>Tích hợp theo dõi trạng thái trang thi.</li>
+                <li>Hoàn thiện lưu nháp, khôi phục và đồng bộ.</li>
+                <li>Xử lý nộp bài lặp và tình huống mất kết nối.</li>
+            </ul>
+
+            <h3>Giai đoạn 4: Kiểm thử và thử nghiệm — 1 tuần</h3>
+
+            <ul>
+                <li>Kiểm tra giao diện trên các kích thước màn hình.</li>
+                <li>Kiểm tra trên Chrome, Safari, Firefox và Edge.</li>
+                <li>Thử chuyển tab, thu nhỏ và quay lại trang thi.</li>
+                <li>Thử tải lại, mất mạng, hết giờ và nộp bài.</li>
+                <li>Thử file đề lỗi, dữ liệu dài và quyền truy cập.</li>
+                <li>Thu thập phản hồi từ nhóm học sinh thử nghiệm.</li>
+            </ul>
+        </section>
+
+        <section id="budget">
+            <h2>6. Nguồn lực và chi phí</h2>
+
+            <h3>6.1. Phân công công việc</h3>
+
+            <p>
+                Nhóm gồm hai thành viên.
+                Các trách nhiệm được phân công theo năng lực
+                và có thể phối hợp giữa các thành viên.
+            </p>
+
+            <ul>
+                <li>
+                    <strong>Frontend:</strong>
+                    Giao diện responsive, nhập đề, làm bài,
+                    báo cáo, lưu nháp và theo dõi trạng thái trang.
+                </li>
+
+                <li>
+                    <strong>Backend và dữ liệu:</strong>
+                    Xác thực, API, cơ sở dữ liệu, quyền sở hữu,
+                    chấm bài và đồng bộ.
+                </li>
+
+                <li>
+                    <strong>Tích hợp và kiểm thử:</strong>
+                    Thống nhất dữ liệu, kiểm tra các luồng sử dụng,
+                    triển khai thử nghiệm và viết tài liệu.
+                </li>
+            </ul>
+
+            <h3>6.2. Các nhóm chi phí dự kiến</h3>
+
+            <ul>
+                <li>Máy chủ chạy backend và phục vụ frontend.</li>
+                <li>Cơ sở dữ liệu và sao lưu.</li>
+                <li>Lưu trữ file đề nếu giữ lại bản gốc.</li>
+                <li>Tên miền và cấu hình HTTPS.</li>
+                <li>Dịch vụ gửi email xác thực và khôi phục mật khẩu.</li>
+                <li>Công cụ theo dõi lỗi và vận hành nếu cần.</li>
+            </ul>
+
+            <p>
+                Dự toán cụ thể được lập sau khi chọn nhà cung cấp,
+                xác định số người dùng và dung lượng lưu trữ.
+                MVP không yêu cầu hạ tầng xử lý video
+                hoặc mô hình AI giám sát.
+            </p>
+        </section>
+
+        <section id="risk-management">
+            <h2>7. Rủi ro và bảo vệ dữ liệu</h2>
+
+            <h3>7.1. Quyền riêng tư</h3>
+
+            <ul>
+                <li>
+                    Thông báo rõ dữ liệu giám sát được ghi nhận
+                    trước khi bắt đầu làm bài.
+                </li>
+
+                <li>
+                    Chỉ thu thập dữ liệu cần thiết cho chức năng;
+                    không thu hình ảnh webcam, âm thanh
+                    hoặc lịch sử website ngoài hệ thống.
+                </li>
+
+                <li>
+                    Người dùng chỉ truy cập đề, bài làm
+                    và nhật ký cá nhân theo quyền được cấp.
+                </li>
+
+                <li>
+                    Sử dụng HTTPS khi triển khai,
+                    băm mật khẩu và bảo vệ thông tin xác thực.
+                </li>
+
+                <li>
+                    Xác định thời hạn lưu trữ và cơ chế xóa
+                    cho dữ liệu chính, nhật ký và bản sao lưu.
+                </li>
+            </ul>
+
+            <h3>7.2. Giới hạn của chức năng giám sát</h3>
+
+            <p>
+                Số lần trang bị ẩn không chứng minh hành vi gian lận.
+                Chuyển ứng dụng, khóa màn hình hoặc gián đoạn thiết bị
+                có thể phát sinh trong quá trình sử dụng.
+            </p>
+
+            <p>
+                Nhật ký phía trình duyệt có thể thiếu sự kiện
+                hoặc bị thay đổi. Vì vậy, dữ liệu này được dùng
+                để hỗ trợ tự đánh giá sự tập trung,
+                không làm căn cứ xử phạt.
+            </p>
+
+            <h3>7.3. Chất lượng đề do người dùng tải lên</h3>
+
+            <ul>
+                <li>
+                    Đề có thể chứa câu hỏi hoặc đáp án sai;
+                    kiểm tra định dạng không bảo đảm đúng chuyên môn.
+                </li>
+
+                <li>
+                    Cung cấp xem trước và chỉnh sửa trước khi lưu.
+                </li>
+
+                <li>
+                    Ghi nhận phiên bản để việc sửa đề
+                    không làm thay đổi kết quả lịch sử.
+                </li>
+
+                <li>
+                    Nhắc người tải đề bảo đảm quyền sử dụng nội dung.
+                    Chia sẻ đề công khai không thuộc phạm vi MVP.
+                </li>
+            </ul>
+
+            <h3>7.4. Rủi ro kỹ thuật</h3>
+
+            <ul>
+                <li>
+                    <strong>Mất mạng:</strong>
+                    Lưu nháp và thông báo trạng thái đồng bộ.
+                </li>
+
+                <li>
+                    <strong>Tải lại trang:</strong>
+                    Khôi phục lượt làm bài và thời hạn đã có.
+                </li>
+
+                <li>
+                    <strong>Nộp nhiều lần:</strong>
+                    Backend xử lý theo mã lượt làm bài,
+                    tránh tạo kết quả trùng.
+                </li>
+
+                <li>
+                    <strong>Dữ liệu trình duyệt bị xóa:</strong>
+                    Thông báo khả năng mất phần chưa đồng bộ;
+                    không cam kết khôi phục dữ liệu chưa lưu lên máy chủ.
+                </li>
+
+                <li>
+                    <strong>Khác biệt thiết bị:</strong>
+                    Kiểm thử giao diện và sự kiện giám sát
+                    trên các trình duyệt, thiết bị mục tiêu.
+                </li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 Web CTQ — Web-based Mock Examination System.</p>
+    </footer>
+</body>
+</html>
