@@ -1,0 +1,139 @@
+/* Shared football identity. Loaded last on every Frontend page. */
+html { color-scheme:light; }
+body.matchday-page { min-height:100vh; display:flex; flex-direction:column; }
+body.matchday-page>main { flex:1; width:100%; }
+.matchday-page [hidden] { display:none !important; }
+.matchday-page h1,.matchday-page h2,.matchday-page h3 { overflow-wrap:anywhere; }
+.matchday-page .md-header { flex-shrink:0; }
+.matchday-page .md-header-inner { gap:20px; }
+.matchday-page .md-account { display:inline-flex; align-items:center; gap:12px; min-height:42px; padding:10px 16px; border:1px solid #647395; border-radius:3px; color:white; font-size:11px; white-space:nowrap; }
+.matchday-page .md-account:hover { background:#ffffff15; }
+.md-theme-bar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding-block:18px; }
+.md-text-link { color:var(--md-accent); display:inline-block; font-size:12px; font-weight:700; padding:10px 0; }
+.md-text-link:hover { text-decoration:underline; }
+.md-prep-links { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.matchday-page .primary-button,.matchday-page .secondary-button { gap:10px; min-height:46px; border-radius:3px; font-size:13px; line-height:1.5; text-align:center; }
+.matchday-page .primary-button { border-color:var(--md-accent); background:var(--md-accent); color:white; }
+.matchday-page .primary-button:hover:not(:disabled) { background:#1C2C5B; border-color:#1C2C5B; }
+.matchday-page .secondary-button { background:white; color:var(--md-accent); border-color:var(--md-accent); }
+.matchday-page .secondary-button:hover { background:var(--md-soft); }
+.matchday-page button:disabled { opacity:.55; cursor:not-allowed; }
+.matchday-page input,.matchday-page select,.matchday-page textarea { color:#1C2C5B; accent-color:var(--md-accent); font:inherit; }
+.matchday-page input:focus,.matchday-page select:focus { outline:2px solid var(--md-focus); outline-offset:3px; border-color:var(--md-focus); }
+.matchday-page .student-main,.matchday-page .exam-main { padding-block:18px 50px; }
+.matchday-page .student-main>h1,.matchday-page .exam-main>h1 { font-size:clamp(27px,3.2vw,40px); line-height:1.2; letter-spacing:-1.2px; margin:0 0 13px; }
+.matchday-page .student-main>.md-eyebrow,.matchday-page .exam-main>.md-eyebrow { color:var(--md-accent); }
+.matchday-page .dashboard-description { font-size:14px; color:#606c7e; max-width:760px; }
+.matchday-page .profile-card,.matchday-page .upload-card,.matchday-page .exam-card { border-radius:4px; border-color:#e0e3e6; background:white; }
+.matchday-page .profile-card h2,.matchday-page .upload-card h2 { font-size:23px; letter-spacing:-.6px; }
+.matchday-page .profile-card>.md-eyebrow { color:var(--md-accent); }
+
+/* Home — a match programme, with a pitch and a three-stage game plan. */
+.md-home-hero .md-hero { min-height:450px; }
+.md-home-hero .md-hero-copy { padding-top:52px; padding-bottom:38px; }
+.md-home-hero .md-hero { grid-template-columns:1.55fr 1fr; }
+.md-home-hero .md-hero h1 { font-size:clamp(30px,3.4vw,46px); line-height:1.16; letter-spacing:-1.7px; }
+.md-home-strip { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:0; }
+.md-home-strip>span { display:flex; align-items:center; justify-content:center; gap:12px; padding:19px 8px; border-bottom:1px solid #dadfe5; font-size:10px; letter-spacing:1.3px; font-weight:700; }
+.md-home-strip b { color:var(--md-accent); font-size:21px; letter-spacing:-1px; }
+.matchday-page .features { padding:54px 0; }
+.matchday-page .section-title { font-size:30px; letter-spacing:-1px; }
+.matchday-page .section-description { font-size:14px; line-height:1.8; margin-bottom:24px; }
+.md-centered { text-align:center; color:var(--md-accent); margin-bottom:18px; }
+.matchday-page .feature-card { border:1px solid #e0e3e6; border-radius:4px; border-top:3px solid var(--md-bright); padding:28px; }
+.md-feature-number { display:block; color:var(--md-accent); font-size:12px; font-weight:800; margin-bottom:24px; }
+.matchday-page .feature-card h3 { color:#1C2C5B; font-size:20px; letter-spacing:-.4px; }
+.matchday-page .feature-card p { font-size:13px; line-height:1.9; color:#606c7e; }
+.matchday-page .about { background:var(--md-soft); border-top:1px solid #e0e3e6; padding:48px 0; }
+.matchday-page .about-description { font-size:14px; line-height:1.9; color:#465677; }
+
+/* Player access — football identity next to the existing functional forms. */
+.matchday-page .auth-page { max-width:1176px; width:calc(100% - 64px); margin:8px auto 40px; padding:0; min-height:0; display:grid; grid-template-columns:1fr 1fr; align-items:stretch; background:white; border:1px solid #e0e3e6; border-radius:4px; overflow:hidden; }
+.md-auth-story { position:relative; background:var(--md-hero); color:var(--md-hero-ink); overflow:hidden; padding:42px 38px; }
+.md-auth-story:before { content:""; position:absolute; inset:0; background:repeating-linear-gradient(115deg,transparent 0 85px,#ffffff06 85px 165px); pointer-events:none; }
+.md-auth-story>.md-eyebrow { color:var(--md-hero-muted); }
+.md-auth-story>h2 { position:relative; font-size:46px; line-height:1.1; letter-spacing:-1.7px; margin:25px 0 20px; color:inherit; }
+.md-auth-story>p:not(.md-eyebrow) { position:relative; font-size:13px; line-height:1.9; max-width:320px; color:var(--md-hero-muted); }
+.md-auth-story .md-stadium { min-height:320px; margin-top:20px; }
+.matchday-page .auth-card { width:100%; max-width:none; border:0; border-radius:0; box-shadow:none; padding:40px; }
+.matchday-page .auth-card h1 { text-align:left; color:#1C2C5B; font-size:31px; letter-spacing:-1px; margin-top:20px; }
+.matchday-page .auth-description { text-align:left; color:#606c7e; font-size:13px; line-height:1.8; }
+.md-form-label { color:var(--md-accent); }
+.matchday-page .form-group label { color:#1C2C5B; font-size:12px; }
+.matchday-page .form-group input { border-radius:4px; border-color:#ccd4de; background:#fafbfD; font-size:16px; }
+.matchday-page .password-toggle { color:var(--md-accent); font-size:12px; }
+.matchday-page .auth-switch { font-size:12px; color:#606c7e; }
+.matchday-page .auth-switch a,.md-demo-link a { color:var(--md-accent); }
+.md-demo-link { border-top:1px solid #e0e3e6; padding-top:20px; margin-top:22px; font-size:12px; text-align:center; }
+.matchday-page .auth-message { background:var(--md-soft); padding:12px; border-left:3px solid var(--md-accent); border-radius:2px; font-size:12px; color:#1C2C5B; }
+
+/* Tactics room / saved exam fixtures */
+.matchday-page .upload-card { padding:32px; }
+.md-upload-icon { display:grid; place-items:center; width:52px; height:52px; margin-bottom:20px; font-size:32px; font-weight:700; background:var(--md-soft); color:var(--md-accent); border-radius:5px; }
+.matchday-page .upload-field { padding:23px; border:1px dashed var(--md-accent); background:var(--md-soft); border-radius:4px; }
+.matchday-page .upload-field input { background:white; border:1px solid #ccd4de; border-radius:3px; font-size:13px; }
+.matchday-page input[type="file"]::file-selector-button { padding:9px 12px; border:0; background:#1C2C5B; color:white; margin-right:12px; border-radius:2px; font:inherit; cursor:pointer; }
+.matchday-page .preview-question { border-radius:3px; background:#fafbfD; }.matchday-page .preview-question p { color:var(--md-accent); }
+.matchday-page .exam-card { border-top:3px solid var(--md-bright); padding:25px; counter-increment:fixture; }
+.matchday-page .exam-grid { counter-reset:fixture; }
+.matchday-page .exam-card:before { content:"TRAINING / 0" counter(fixture); font-size:9px; font-weight:800; letter-spacing:1.7px; color:var(--md-accent); margin-bottom:20px; }
+.matchday-page .exam-description { font-size:13px; }.matchday-page .exam-action { margin-top:24px; }
+
+/* Live session — timer scoreboard, team-sheet navigation, selected answers */
+.matchday-page .exam-header { background:#1C2C5B; color:white; border:0; }
+.matchday-page .exam-header-content { min-height:76px; padding-block:12px; }
+.matchday-page .exam-back { color:white; font-size:12px; }
+.matchday-page .exam-timer { background:#101e42; border:1px solid #566584; border-radius:3px; color:#ccd4e4; font-size:11px; display:flex; gap:17px; align-items:center; }
+.matchday-page #time-remaining { color:white; font-size:28px; font-weight:800; }
+.matchday-page .exam-timer.is-warning { background:#fff0ee; color:#991b1b; border-color:#EC3325; }.matchday-page .exam-timer.is-warning #time-remaining { color:#DB0007; }
+.matchday-page .exam-note { font-size:13px; color:#606c7e; }
+.matchday-page .exam-monitor { border-radius:3px; border-color:#dfcd9e; background:#fff8e6; color:#624f21; padding:13px 18px; font-size:12px; }
+.matchday-page #monitor-message,.matchday-page #exam-save-message { font-size:11px; line-height:1.8; }.matchday-page #exam-save-message { color:#606c7e; }
+.matchday-page .question-navigation { border-radius:4px; border-top:3px solid var(--md-bright); }
+.matchday-page .question-navigation h2 { font-size:16px; }.matchday-page .question-navigation h2:before { content:"TEAM SHEET"; display:block; font-size:8px; letter-spacing:1.7px; margin-bottom:9px; color:var(--md-accent); }
+.matchday-page .question-button { border-radius:3px; color:#1C2C5B; border-color:#ccd4de; }
+.matchday-page .question-button.is-answered { background:var(--md-accent); color:white; border-color:var(--md-accent); }
+.matchday-page .question-button.is-flagged { box-shadow:0 0 0 3px #FFC659; }
+.matchday-page .question-button[aria-current="true"] { outline:2px solid #1C2C5B; outline-offset:4px; }
+.matchday-page .question-card { border-radius:4px; border-color:#d8dfe7; padding:24px; }
+.matchday-page .question-card legend { font-size:19px; color:#1C2C5B; }
+.matchday-page .answer-option { border-radius:4px; border-color:#dce1e7; }.matchday-page .answer-option:hover { background:var(--md-soft); }
+.matchday-page .answer-option:has(input:checked) { background:var(--md-soft); border-color:var(--md-accent); box-shadow:inset 3px 0 0 var(--md-accent); }
+.matchday-page .answer-option:focus-within { outline-color:var(--md-focus); }.matchday-page .answer-option input { accent-color:var(--md-accent); }
+.matchday-page .question-step { background:white; color:var(--md-accent); border-color:var(--md-accent); border-radius:3px; font-size:12px; }
+.matchday-page .question-step:hover:not(:disabled) { background:var(--md-soft); }.matchday-page .question-step:disabled { border-color:#dce1e7; color:#778194; }
+.matchday-page .flag-button { border-radius:3px; border-color:#9C824A; color:#624f21; font-size:12px; }.matchday-page .flag-button[aria-pressed="true"] { background:#FFC659; }
+.matchday-page .navigation-help,.matchday-page #answered-count { font-size:11px; }
+
+/* Full-time scoreboard and post-match review */
+.md-result-panel { position:relative; overflow:hidden; display:flex; align-items:center; justify-content:space-between; gap:25px; padding:32px 36px; background:#1C2C5B; color:white; border-left:7px solid var(--md-bright); margin-top:24px; border-radius:4px; }
+.md-result-panel:before { content:""; position:absolute; width:280px; height:280px; border:1px solid #ffffff15; border-radius:50%; right:50px; top:-40px; pointer-events:none; }
+.md-result-panel .md-eyebrow { color:#FFC659; }.md-result-panel h2 { color:white; font-size:26px; line-height:1.3; letter-spacing:-.7px; margin:8px 0 12px; }.md-result-panel p:not(.md-eyebrow) { font-size:12px; color:#ccd4e4; line-height:1.8; max-width:440px; }
+.md-final-score { flex-shrink:0; text-align:center; z-index:1; margin:0; padding-left:28px; border-left:1px solid #ffffff30; }.md-final-score dt { font-size:9px; letter-spacing:2px; color:#ccd4e4; }.md-final-score dd { margin:10px 0 0; font-size:65px; letter-spacing:-3px; font-weight:800; font-variant-numeric:tabular-nums; }.md-final-score small { font-size:16px; letter-spacing:0; color:#FFC659; }
+.matchday-page .report-stats { grid-template-columns:repeat(3,minmax(0,1fr)); }.matchday-page .report-stat { background:#fafbfD; border-radius:3px; padding:20px 10px; }.matchday-page .report-stat dt { font-size:12px; }.matchday-page .report-stat dd { color:var(--md-accent); font-size:32px; }
+.matchday-page .review-card { border-radius:3px; background:#fafbfD; }.matchday-page .review-card h3 { font-size:17px; }.matchday-page .review-card p { font-size:13px; }.matchday-page .review-correct { border-left-color:#063672; }.matchday-page .review-correct .review-status { color:#063672; }.matchday-page .review-wrong { border-left-color:#EC3325; background:#fff5f3; }.matchday-page .review-wrong .review-status { color:#a81b12; }.matchday-page .review-unanswered { border-left-color:#D4A12A; background:#fff9e9; }.matchday-page .review-unanswered .review-status { color:#624f21; }
+.matchday-page .review-filter label { font-size:12px; }.matchday-page .review-filter select { border-radius:3px; font-size:13px; min-height:44px; }.md-report-actions { display:flex; gap:12px; flex-wrap:wrap; }
+@media(max-width:1000px) { .md-home-hero .md-hero h1 { font-size:35px; }.md-auth-story>h2 { font-size:36px; }.matchday-page .auth-card { padding:30px; }.md-account { display:none !important; } }
+@media(max-width:700px) {
+ .md-theme-bar { flex-direction:column; align-items:flex-start; gap:10px; padding-block:15px; }.md-theme-bar .md-breadcrumb { font-size:8px; }
+ .matchday-page .md-nav { gap:0; justify-content:space-between; }.matchday-page .md-nav a { font-size:11px; }.matchday-page .md-header-inner { padding-top:16px; }
+ .md-home-hero .md-hero { grid-template-columns:1fr; min-height:0; }.md-home-hero .md-hero-copy { padding:30px 24px; }.md-home-hero .md-hero h1 { font-size:clamp(27px,6.8vw,40px); letter-spacing:-1px; line-height:1.2; }.md-home-strip>span { gap:6px; padding:16px 3px; font-size:7px; letter-spacing:.5px; }.md-home-strip b { font-size:17px; }
+ .matchday-page .features { padding-block:35px; }.matchday-page .section-title { font-size:25px; }.matchday-page .feature-grid { grid-template-columns:1fr; }.matchday-page .about { padding-block:35px; }
+ .matchday-page .auth-page { width:calc(100% - 40px); grid-template-columns:1fr; margin-bottom:30px; }.md-auth-story { padding:25px; }.md-auth-story>h2 { font-size:31px; margin-block:15px; }.md-auth-story>p:not(.md-eyebrow) { max-width:none; font-size:12px; }.md-auth-story .md-stadium { display:none; }.matchday-page .auth-card { padding:28px 24px; }.matchday-page .auth-card h1 { font-size:27px; }
+ .matchday-page .student-main,.matchday-page .exam-main { padding-top:13px; }.matchday-page .upload-card { padding:23px; }.matchday-page .upload-field { padding:16px; }.matchday-page .upload-field input { padding:9px; }.matchday-page input[type="file"]::file-selector-button { margin-right:7px; padding:8px; }
+ .matchday-page .exam-header-content { flex-direction:row; align-items:center; gap:8px; }.matchday-page .exam-timer { flex-direction:column; gap:3px; padding:8px 13px; }.matchday-page #time-remaining { font-size:24px; }.matchday-page .exam-layout { gap:18px; }.matchday-page .question-card { padding:18px; }.matchday-page .question-card legend { font-size:17px; }
+ .md-result-panel { padding:26px 22px; flex-direction:column; align-items:flex-start; gap:20px; }.md-result-panel h2 { font-size:24px; }.md-final-score { border-left:0; border-top:1px solid #ffffff30; padding:20px 0 0; width:100%; text-align:left; }.md-final-score dd { font-size:58px; }.matchday-page .report-stats { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }.matchday-page .report-stat dd { font-size:27px; }.matchday-page .report-stat dt { font-size:11px; }.md-report-actions>a { width:100%; }.md-prep-links { width:100%; }
+}
+@media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; } }
+
+/* FE demonstration session and sample catalogue. */
+html[data-auth-blocked="true"] body { visibility:hidden; }
+.md-demo-notice { padding:16px; margin:20px 0 24px; background:var(--md-soft); border-left:3px solid var(--md-accent); font-size:12px; line-height:1.8; overflow-wrap:anywhere; }
+.md-demo-notice p { margin:8px 0; }.md-demo-notice code { font-size:12px; }.md-demo-notice .secondary-button { padding:8px 12px; margin-top:8px; }
+.md-catalogue-label { margin-top:36px; color:var(--md-accent); }.md-catalogue-detail { font-size:13px; font-weight:600; color:#1C2C5B; margin-top:20px; }
+.matchday-page .md-account { cursor:pointer; background:transparent; font:inherit; font-size:11px; }
+@media(max-width:1000px) { .matchday-page .md-header-inner { flex-wrap:wrap; }.matchday-page .md-nav { flex-wrap:wrap; }.matchday-page .md-account { display:inline-flex !important; margin-bottom:10px; min-height:44px; } }
+@media(max-width:700px) { .matchday-page .md-nav { gap:0 16px; justify-content:flex-start; }.matchday-page .md-nav a { min-height:44px; }.matchday-page .md-account { margin-top:8px; } }
+
+.md-catalogue-page .exam-action { margin-top:auto; }
+.md-catalogue-page .md-catalogue-detail { margin-bottom:24px; }

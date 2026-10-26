@@ -1,0 +1,26 @@
+{
+    "title": "Đề luyện tập Toán",
+    "durationMinutes": 30,
+    "questions": [
+        {
+            "text": "Giá trị của 2 + 3 là bao nhiêu?",
+            "options": {
+                "a": "4",
+                "b": "5",
+                "c": "6",
+                "d": "7"
+            },
+            "correctAnswer": "b"
+        },
+        {
+            "text": "Giá trị của 3 × 4 là bao nhiêu?",
+            "options": {
+                "a": "7",
+                "b": "10",
+                "c": "12",
+                "d": "14"
+            },
+            "correctAnswer": "c"
+        }
+    ]
+}

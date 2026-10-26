@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi" data-club="arsenal" data-requires-auth="true">
+<head>
+    <meta charset="UTF-8">
+<script src="../assets/js/auth-session.js"></script>
+<script src="../assets/js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#DB0007">
+    <title>Matchday — Trang cá nhân | Thi thử trực tuyến</title>
+    
+    <script src="../assets/js/club-init.js"></script>
+<link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <script src="../assets/js/matchday.js" defer></script>
+    <script src="../assets/js/history.js" defer></script>
+    <link rel="stylesheet" href="../assets/css/matchday-global.css">
+</head>
+<body class="matchday-page matchday-page md-profile-page">
+    <a class="md-skip" href="#main-content">Đến nội dung chính</a>
+    <header class="md-header"><div class="container md-header-inner"><a class="md-brand" href="../index.html" aria-label="Matchday — Trang chủ"><span class="md-brand-mark" aria-hidden="true">M<span>★</span></span><span>MATCHDAY<small>THI THỬ TRỰC TUYẾN</small></span></a><nav class="md-nav" aria-label="Điều hướng chính"><a href="../index.html">Trang chủ</a><a href="../student/profile.html" aria-current="page">Trang cá nhân</a><a href="../student/exams.html">Đề mẫu</a><a href="../student/my-exams.html">Đề của tôi</a><a href="../student/upload-exam.html">Tải đề thi</a></nav><button class="md-account" type="button">Đăng xuất <span aria-hidden="true">↗</span></button></div></header>
+
+    <main id="main-content" class="container md-main">
+        <div class="md-page-top">
+            <div class="md-breadcrumb">KHU VỰC CÁ NHÂN <span>/</span> MATCHDAY HUB</div>
+            
+        </div>
+
+        <section class="md-hero" aria-labelledby="dashboard-title">
+            <div class="md-hero-copy">
+                <p class="md-eyebrow"><span aria-hidden="true"></span> SẴN SÀNG CHO THỬ THÁCH TIẾP THEO</p>
+                <h1 id="dashboard-title">MỖI BÀI THI.<br>MỘT <em>TRẬN ĐẤU.</em></h1>
+                <p class="md-hero-description">Bước vào sân, chinh phục từng câu hỏi.<br>Luyện tập hôm nay để bứt phá ngày mai.</p>
+                <div class="md-hero-actions">
+                    <a class="md-button md-button-light" href="exams.html">Chọn đề luyện tập <span aria-hidden="true">↗</span></a>
+                    <a class="md-hero-link" href="upload-exam.html">Tải đề của bạn <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="md-hero-foot"><span class="md-tiny-ball" aria-hidden="true">✦</span> LUYỆN TẬP · TẬP TRUNG · BỨT PHÁ</div>
+            </div>
+            <div class="md-stadium" aria-hidden="true">
+                <svg class="md-pitch" viewBox="0 0 420 450" fill="none">
+                    <path d="M45 25H375V425H45Z M45 225H375"/>
+                    <circle cx="210" cy="225" r="59"/><circle cx="210" cy="225" r="3" fill="currentColor"/>
+                    <path d="M117 25V96H303V25 M164 25V52H256V25 M117 425V354H303V425 M164 425V398H256V425"/>
+                    <path d="M165 96Q210 137 255 96 M165 354Q210 313 255 354"/>
+                    <circle cx="210" cy="79" r="3" fill="currentColor"/><circle cx="210" cy="371" r="3" fill="currentColor"/>
+                </svg>
+                <div class="md-club-seal"><span class="md-seal-top">THE MATCHDAY CLUB</span><strong data-club-short>ARS</strong><span class="md-seal-star">★</span><span class="md-seal-bottom" data-club-motto>RED &amp; WHITE</span></div>
+                <div class="md-team-label"><span data-club-name>ARSENAL</span><small>ARSENAL INSPIRED / RED EDITION</small></div>
+            </div>
+        </section>
+
+        <section class="md-scoreboard" aria-label="Thống kê kết quả đã lưu">
+            <div class="md-scoreboard-label"><span class="md-eyebrow">YOUR SEASON</span><h2>Phong độ của bạn</h2></div>
+            <dl class="md-stats">
+                <div><dt>Lượt thi đã lưu</dt><dd id="md-attempts">—</dd></div>
+                <div><dt>Điểm trung bình</dt><dd id="md-average">—</dd></div>
+                <div><dt>Điểm cao nhất</dt><dd id="md-best">—</dd></div>
+            </dl>
+        </section>
+
+        <section class="md-prep" aria-labelledby="practice-title">
+            <div class="md-kit" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M30 12 12 25 3 44 23 53 29 42V89H71V42L77 53 97 44 88 25 70 12 61 17H39Z"/><path class="md-kit-neck" d="M39 17Q50 35 61 17"/><text x="50" y="66" text-anchor="middle">01</text></svg></div>
+            <div class="md-prep-copy"><p class="md-eyebrow">THE TRAINING GROUND</p><h2 id="practice-title">Đề của bạn. Sân chơi của bạn.</h2><p>Tải đề JSON, chuẩn bị chiến thuật và bắt đầu lượt luyện tập mới.</p></div>
+            <div class="md-prep-links"><a class="md-button md-button-primary" href="upload-exam.html">Tải đề thi JSON <span aria-hidden="true">↑</span></a><a class="md-text-link" href="my-exams.html">Xem đề của tôi →</a></div>
+        </section>
+
+        <section class="md-history" aria-labelledby="history-title">
+            <div class="md-section-heading"><div><p class="md-eyebrow">MATCH HISTORY</p><h2 id="history-title">Những trận đấu gần đây</h2></div><span class="md-section-note">3 LƯỢT GẦN NHẤT</span></div>
+            <p id="history-message" role="status" aria-live="polite">Đang đọc lịch sử làm bài…</p>
+            <div id="history-list"></div>
+            <noscript><p>Bật JavaScript để xem lịch sử làm bài và chuyển phong cách câu lạc bộ.</p></noscript>
+        </section>
+
+        <aside class="md-storage" aria-label="Thông tin lưu bài"><span aria-hidden="true">ⓘ</span><p><strong>Tiếp tục phong độ của bạn.</strong> Bài đang làm được khôi phục trong cùng tab. Toàn bộ lịch sử được lưu trong trình duyệt này; xóa dữ liệu trang web sẽ xóa lịch sử.</p></aside>
+        
+    </main>
+    <footer class="md-footer"><div class="container"><strong>MATCHDAY<span>★</span></strong><p>Mỗi ngày luyện tập. Một bước tiến xa hơn.</p><span>FOOTBALL INSPIRED · BUILT FOR LEARNING</span></div></footer>
+</body>
+</html>

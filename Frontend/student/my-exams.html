@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi" data-club="arsenal" data-requires-auth="true">
+    <head>
+        <meta charset="UTF-8">
+<script src="../assets/js/auth-session.js"></script>
+<script src="../assets/js/auth-guard.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Đề của tôi</title>
+    <meta name="theme-color" content="#DB0007">
+    <script src="../assets/js/club-init.js"></script>
+
+        <link rel="stylesheet" href="../assets/css/style.css">
+        <link rel="stylesheet" href="../assets/css/dashboard.css">
+        <script src="../assets/js/my-exams.js" defer></script>
+        <link rel="stylesheet" href="../assets/css/matchday-global.css">
+    <script src="../assets/js/matchday.js" defer></script>
+</head>
+
+    <body class="dashboard-page matchday-page md-exams-page">
+<a class="md-skip" href="#main-content">Đến nội dung chính</a>
+        <header class="md-header"><div class="container md-header-inner"><a class="md-brand" href="../index.html" aria-label="Matchday — Trang chủ"><span class="md-brand-mark" aria-hidden="true">M<span>★</span></span><span>MATCHDAY<small>THI THỬ TRỰC TUYẾN</small></span></a><nav class="md-nav" aria-label="Điều hướng chính"><a href="../index.html">Trang chủ</a><a href="../student/profile.html">Trang cá nhân</a><a href="../student/exams.html">Đề mẫu</a><a href="../student/my-exams.html" aria-current="page">Đề của tôi</a><a href="../student/upload-exam.html">Tải đề thi</a></nav><button class="md-account" type="button">Đăng xuất <span aria-hidden="true">↗</span></button></div></header><div class="container md-theme-bar"><span class="md-breadcrumb">THE FIXTURES / ĐỀ CỦA TÔI</span></div>
+
+        <main class="container student-main" id="main-content">
+            <p class="md-eyebrow">THE FIXTURES</p><h1>Đề của tôi</h1>
+
+            <p class="dashboard-description">
+                Các đề đã lưu trên trình duyệt của thiết bị này.
+            </p>
+
+            <a class="primary-button" href="upload-exam.html">
+                Tải thêm đề
+            </a>
+
+            <p
+                id="my-exams-message"
+                class="dashboard-description"
+                role="status"
+            ></p>
+
+            <div id="my-exams-list" class="exam-grid"></div>
+        </main>
+    <footer class="md-footer"><div class="container"><strong>MATCHDAY<span>★</span></strong><p>Mỗi ngày luyện tập. Một bước tiến xa hơn.</p><span>FOOTBALL INSPIRED · BUILT FOR LEARNING</span></div></footer>
+
+</body>
+</html>

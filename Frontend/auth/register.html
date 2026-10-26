@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi" data-club="arsenal">
+    <head>
+        <meta charset="UTF-8">
+<script src="../assets/js/auth-session.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Đăng ký</title>
+    <meta name="theme-color" content="#DB0007">
+    <script src="../assets/js/club-init.js"></script>
+        <link rel="stylesheet" href="../assets/css/style.css">
+        <link rel="stylesheet" href="../assets/css/auth.css">
+        <script src="../assets/js/auth.js" defer></script>
+        <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../assets/css/matchday-global.css">
+    <script src="../assets/js/matchday.js" defer></script>
+</head>
+    <body class=" matchday-page md-register-page">
+<a class="md-skip" href="#main-content">Đến nội dung chính</a>
+        <header class="md-header"><div class="container md-header-inner"><a class="md-brand" href="../index.html" aria-label="Matchday — Trang chủ"><span class="md-brand-mark" aria-hidden="true">M<span>★</span></span><span>MATCHDAY<small>THI THỬ TRỰC TUYẾN</small></span></a><nav class="md-nav" aria-label="Điều hướng chính"><a href="../index.html">Trang chủ</a><a href="../student/profile.html">Trang cá nhân</a><a href="../student/exams.html">Đề mẫu</a><a href="../student/my-exams.html">Đề của tôi</a><a href="../student/upload-exam.html">Tải đề thi</a></nav><a class="md-account" href="../auth/login.html">Đăng nhập <span aria-hidden="true">↗</span></a></div></header><div class="container md-theme-bar"><span class="md-breadcrumb">JOIN THE CLUB / ĐĂNG KÝ</span></div>
+<main class="auth-page" id="main-content">
+            <aside class="md-auth-story"><p class="md-eyebrow">JOIN THE CLUB</p><h2>GIA NHẬP<br>ĐỘI HÌNH.</h2><p>Bắt đầu hành trình học tập theo nhịp của bạn. Chuẩn bị tốt, tự tin bước vào sân.</p><div class="md-stadium" aria-hidden="true">
+                <svg class="md-pitch" viewBox="0 0 420 450" fill="none">
+                    <path d="M45 25H375V425H45Z M45 225H375"/>
+                    <circle cx="210" cy="225" r="59"/><circle cx="210" cy="225" r="3" fill="currentColor"/>
+                    <path d="M117 25V96H303V25 M164 25V52H256V25 M117 425V354H303V425 M164 425V398H256V425"/>
+                    <path d="M165 96Q210 137 255 96 M165 354Q210 313 255 354"/>
+                    <circle cx="210" cy="79" r="3" fill="currentColor"/><circle cx="210" cy="371" r="3" fill="currentColor"/>
+                </svg>
+                <div class="md-club-seal"><span class="md-seal-top">THE MATCHDAY CLUB</span><strong data-club-short>ARS</strong><span class="md-seal-star">★</span><span class="md-seal-bottom" data-club-motto>RED &amp; WHITE</span></div>
+                <div class="md-team-label"><span data-club-name>ARSENAL</span><small>ARSENAL INSPIRED / RED EDITION</small></div>
+            </div></aside>
+<section class="auth-card" aria-labelledby="register-title">
+                <p class="md-eyebrow md-form-label">MATCHDAY / JOIN THE CLUB</p>
+                <h1 id="register-title">Tạo tài khoản</h1>
+                <p class="auth-description">Đăng ký tài khoản để bắt đầu luyện thi</p>
+                
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="full-name">Họ và tên</label>
+                        <input
+                            type="text"
+                            id="full-name"
+                            name="fullName"
+                            autocomplete="name"
+                            placeholder="Nhập họ và tên"
+                            required
+                        >  
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            autocomplete="username"
+                            placeholder="Nhập email của bạn"
+                            required
+                        >
+                    </div>
+                
+                    <div class="form-group">
+                        <label for="password">Mật khẩu</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            autocomplete="new-password"
+                            placeholder="Tạo mật khẩu"
+                            minlength="8"
+                            aria-describedby="password-help"
+                            required
+                        >
+
+                        <p id="password-help" class="form-help">
+                            Mật khẩu cần có ít nhất 8 ký tự.
+                        </p>
+
+                        <button
+                            class="password-toggle"
+                            type="button"
+                            data-target="password"
+                            aria-controls="password"
+                            aria-pressed="false"
+                        >
+                            Hiện mật khẩu
+                        </button>
+                    </div>
+                
+                    <div class="form-group">
+                        <label for="confirm-password">Nhập lại mật khẩu</label>
+                        <input
+                            type="password"
+                            id="confirm-password"
+                            name="confirmPassword"
+                            autocomplete="new-password"
+                            placeholder="Nhập lại mật khẩu"
+                            minlength="8"
+                            aria-describedby="password-help"
+                            required
+                        > 
+
+                        <button
+                            class="password-toggle"
+                            type="button"
+                            data-target="confirm-password"
+                            aria-controls="confirm-password"
+                            aria-pressed="false"
+                        >
+                            Hiện mật khẩu
+                        </button>
+                    </div>
+                    
+                    <p id="register-message" class="auth-message" role="status"></p>
+                    <button class="primary-button auth-submit" type="button" disabled>
+                        Tạo tài khoản
+                    </button>
+                </form>
+
+                <p class="auth-switch">Đã có tài khoản?
+                    <a href="login.html">Đăng nhập</a>
+                </p>
+            </section>
+        </main>
+    <footer class="md-footer"><div class="container"><strong>MATCHDAY<span>★</span></strong><p>Mỗi ngày luyện tập. Một bước tiến xa hơn.</p><span>FOOTBALL INSPIRED · BUILT FOR LEARNING</span></div></footer>
+
+</body>
+</html>

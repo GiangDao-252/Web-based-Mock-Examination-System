@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi" data-club="arsenal" data-requires-auth="true">
+    <head>
+        <meta charset="UTF-8">
+<script src="../assets/js/auth-session.js"></script>
+<script src="../assets/js/auth-guard.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Kết quả bài thi</title>
+    <meta name="theme-color" content="#DB0007">
+    <script src="../assets/js/club-init.js"></script>
+
+        <link rel="stylesheet" href="../assets/css/style.css">
+        <link rel="stylesheet" href="../assets/css/dashboard.css">
+        <script src="../assets/js/report.js" defer></script>
+        <link rel="stylesheet" href="../assets/css/matchday-global.css">
+    <script src="../assets/js/matchday.js" defer></script>
+</head>
+
+    <body class="dashboard-page matchday-page md-report-page">
+<a class="md-skip" href="#main-content">Đến nội dung chính</a>
+        <header class="md-header"><div class="container md-header-inner"><a class="md-brand" href="../index.html" aria-label="Matchday — Trang chủ"><span class="md-brand-mark" aria-hidden="true">M<span>★</span></span><span>MATCHDAY<small>THI THỬ TRỰC TUYẾN</small></span></a><nav class="md-nav" aria-label="Điều hướng chính"><a href="../index.html">Trang chủ</a><a href="../student/profile.html">Trang cá nhân</a><a href="../student/exams.html">Đề mẫu</a><a href="../student/my-exams.html">Đề của tôi</a><a href="../student/upload-exam.html">Tải đề thi</a></nav><button class="md-account" type="button">Đăng xuất <span aria-hidden="true">↗</span></button></div></header><div class="container md-theme-bar"><span class="md-breadcrumb">FULL TIME / KẾT QUẢ</span></div>
+
+        <main class="container student-main" id="main-content">
+<p class="md-eyebrow">THE FINAL WHISTLE</p><h1>Kết quả bài thi</h1>
+<p id="report-message" class="dashboard-description" role="status">Chưa có dữ liệu bài thi để hiển thị.</p>
+<section class="md-result-panel" aria-labelledby="report-title"><div><p class="md-eyebrow">FULL TIME</p><h2 id="report-title">Mỗi kết quả là một bước tiến.</h2><p>Xem lại bài làm, hiểu từng đáp án và sẵn sàng cho lần tiếp theo.</p></div><dl class="md-final-score"><dt>ĐIỂM CỦA BẠN</dt><dd><span id="report-score">—</span><small> / 10</small></dd></dl></section>
+<section class="profile-card md-report-details" aria-labelledby="stats-title"><p class="md-eyebrow">MATCH STATS</p><h2 id="stats-title">Thống kê bài làm</h2><dl class="report-stats">
+<div class="report-stat"><dt>Tổng số câu</dt><dd id="report-total">—</dd></div>
+<div class="report-stat"><dt>Đã trả lời</dt><dd id="report-answered">—</dd></div>
+<div class="report-stat"><dt>Chưa trả lời</dt><dd id="report-unanswered">—</dd></div>
+<div class="report-stat"><dt>Số câu đúng</dt><dd id="report-correct">—</dd></div>
+<div class="report-stat"><dt>Số câu sai</dt><dd id="report-wrong">—</dd></div>
+<div class="report-stat"><dt>Số lần rời trang</dt><dd id="report-page-leaves">—</dd></div></dl><p class="dashboard-description">Mỗi câu có trọng số bằng nhau. Câu sai hoặc bỏ trống không được tính điểm.</p></section>
+<section id="answer-review" class="profile-card" aria-labelledby="review-title" hidden><p class="md-eyebrow">POST-MATCH REVIEW</p><h2 id="review-title">Xem lại bài làm</h2><div class="review-filter"><label for="review-filter">Hiển thị câu hỏi</label><select id="review-filter"><option value="all">Tất cả câu hỏi</option><option value="correct">Câu đúng</option><option value="wrong">Câu sai</option><option value="unanswered">Câu chưa trả lời</option></select></div><p id="review-filter-message" role="status"></p><div id="review-list"></div></section>
+<div class="md-report-actions"><a class="primary-button" href="profile.html">Về trang cá nhân →</a><a class="secondary-button" href="my-exams.html">Chọn đề tiếp theo</a></div></main>
+    <footer class="md-footer"><div class="container"><strong>MATCHDAY<span>★</span></strong><p>Mỗi ngày luyện tập. Một bước tiến xa hơn.</p><span>FOOTBALL INSPIRED · BUILT FOR LEARNING</span></div></footer>
+
+</body>
+</html>

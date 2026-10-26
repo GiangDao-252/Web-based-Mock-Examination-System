@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi" data-club="arsenal">
+    <head>
+        <meta charset="UTF-8">
+<script src="../assets/js/auth-session.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Đăng nhập Web-based Mock Examination System</title>
+    <meta name="theme-color" content="#DB0007">
+    <script src="../assets/js/club-init.js"></script>
+        <link rel="stylesheet" href="../assets/css/style.css">
+        <link rel="stylesheet" href="../assets/css/auth.css">
+        <script src="../assets/js/auth.js" defer></script>
+        <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../assets/css/matchday-global.css">
+    <script src="../assets/js/matchday.js" defer></script>
+</head>
+    <body class=" matchday-page md-login-page">
+<a class="md-skip" href="#main-content">Đến nội dung chính</a>
+        <header class="md-header"><div class="container md-header-inner"><a class="md-brand" href="../index.html" aria-label="Matchday — Trang chủ"><span class="md-brand-mark" aria-hidden="true">M<span>★</span></span><span>MATCHDAY<small>THI THỬ TRỰC TUYẾN</small></span></a><nav class="md-nav" aria-label="Điều hướng chính"><a href="../index.html">Trang chủ</a><a href="../student/profile.html">Trang cá nhân</a><a href="../student/exams.html">Đề mẫu</a><a href="../student/my-exams.html">Đề của tôi</a><a href="../student/upload-exam.html">Tải đề thi</a></nav><a class="md-account" href="../auth/login.html">Đăng nhập <span aria-hidden="true">↗</span></a></div></header><div class="container md-theme-bar"><span class="md-breadcrumb">PLAYER ACCESS / ĐĂNG NHẬP</span></div>
+<main class="auth-page" id="main-content">
+            <aside class="md-auth-story"><p class="md-eyebrow">PLAYER ACCESS</p><h2>VÀO SÂN.<br>CHINH PHỤC.</h2><p>Trở lại không gian luyện tập của bạn. Mỗi lượt làm bài là một cơ hội tiến bộ.</p><div class="md-stadium" aria-hidden="true">
+                <svg class="md-pitch" viewBox="0 0 420 450" fill="none">
+                    <path d="M45 25H375V425H45Z M45 225H375"/>
+                    <circle cx="210" cy="225" r="59"/><circle cx="210" cy="225" r="3" fill="currentColor"/>
+                    <path d="M117 25V96H303V25 M164 25V52H256V25 M117 425V354H303V425 M164 425V398H256V425"/>
+                    <path d="M165 96Q210 137 255 96 M165 354Q210 313 255 354"/>
+                    <circle cx="210" cy="79" r="3" fill="currentColor"/><circle cx="210" cy="371" r="3" fill="currentColor"/>
+                </svg>
+                <div class="md-club-seal"><span class="md-seal-top">THE MATCHDAY CLUB</span><strong data-club-short>ARS</strong><span class="md-seal-star">★</span><span class="md-seal-bottom" data-club-motto>RED &amp; WHITE</span></div>
+                <div class="md-team-label"><span data-club-name>ARSENAL</span><small>ARSENAL INSPIRED / RED EDITION</small></div>
+            </div></aside>
+<section class="auth-card" aria-labelledby="login-title">
+                <p class="md-eyebrow md-form-label">MATCHDAY / PLAYER ACCESS</p>
+
+                <h1 id="login-title">Đăng nhập</h1>
+                <p class="auth-description">
+                    Đăng nhập mô phỏng để chọn đề và kiểm tra luồng làm bài.
+                </p>
+
+                <aside class="md-demo-notice" aria-label="Tài khoản mô phỏng"><strong>Bản thử nghiệm FE — Đăng nhập mô phỏng</strong><p>Chưa kết nối máy chủ. Dùng tài khoản dưới đây để thử luồng học sinh; không nhập mật khẩu thật.</p><p>Email: <code>demo@matchday.local</code><br>Mật khẩu: <code>Matchday123!</code></p><button id="fill-demo-account" class="secondary-button" type="button">Điền tài khoản demo</button></aside><form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            autocomplete="username"
+                            placeholder="Nhập email của bạn"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Mật khẩu</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            autocomplete="current-password"
+                            placeholder="Nhập mật khẩu"
+                            required
+                        >
+                        <button
+                            class="password-toggle"
+                            type="button"
+                            data-target="password"
+                            aria-controls="password"
+                            aria-pressed="false"
+                        >
+                            Hiện mật khẩu
+                        </button>
+                    </div>
+                    <p class = "auth-switch">
+                        <a href="forgot-password.html">Quên mật khẩu?</a>
+                    </p>
+                    <p id="login-message" class="auth-message" role="status"></p>
+                    <button class="primary-button auth-submit" type="button" disabled> Đăng nhập demo</button>
+                </form>
+                <p class="auth-switch">
+                    Chưa có tài khoản?
+                    <a href="register.html">Đăng ký ngay</a>
+                </p>
+            </section>
+        </main>
+    <footer class="md-footer"><div class="container"><strong>MATCHDAY<span>★</span></strong><p>Mỗi ngày luyện tập. Một bước tiến xa hơn.</p><span>FOOTBALL INSPIRED · BUILT FOR LEARNING</span></div></footer>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi" data-club="arsenal" data-requires-auth="true">
+    <head>
+        <meta charset="UTF-8">
+<script src="../assets/js/auth-session.js"></script>
+<script src="../assets/js/auth-guard.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Tải đề lên</title>
+    <meta name="theme-color" content="#DB0007">
+    <script src="../assets/js/club-init.js"></script>
+
+        <link rel="stylesheet" href="../assets/css/style.css">
+        <link rel="stylesheet" href="../assets/css/dashboard.css">
+        <link rel="stylesheet" href="../assets/css/upload.css">
+        <script src="../assets/js/upload-exam.js" defer></script>
+        <link rel="stylesheet" href="../assets/css/matchday-global.css">
+    <script src="../assets/js/matchday.js" defer></script>
+</head>
+
+    <body class="dashboard-page matchday-page md-upload-page">
+<a class="md-skip" href="#main-content">Đến nội dung chính</a>
+        <header class="md-header"><div class="container md-header-inner"><a class="md-brand" href="../index.html" aria-label="Matchday — Trang chủ"><span class="md-brand-mark" aria-hidden="true">M<span>★</span></span><span>MATCHDAY<small>THI THỬ TRỰC TUYẾN</small></span></a><nav class="md-nav" aria-label="Điều hướng chính"><a href="../index.html">Trang chủ</a><a href="../student/profile.html">Trang cá nhân</a><a href="../student/exams.html">Đề mẫu</a><a href="../student/my-exams.html">Đề của tôi</a><a href="../student/upload-exam.html" aria-current="page">Tải đề thi</a></nav><button class="md-account" type="button">Đăng xuất <span aria-hidden="true">↗</span></button></div></header><div class="container md-theme-bar"><span class="md-breadcrumb">TACTICS ROOM / TẢI ĐỀ</span></div>
+
+        <main class="container student-main" id="main-content">
+            <p class="md-eyebrow">TACTICS ROOM</p><h1>Chuẩn bị đề. Sẵn sàng vào sân.</h1>
+
+            
+
+            <p class="dashboard-description">
+                Chọn file đề để kiểm tra nội dung trước khi lưu.
+            </p>
+
+            <a class="secondary-button" href="my-exams.html">
+                Xem đề của tôi
+            </a>
+
+            <section class="upload-card" aria-labelledby="upload-title">
+                <span class="md-upload-icon" aria-hidden="true">↑</span><p class="md-eyebrow">01 / CHỌN ĐỀ</p><h2 id="upload-title">Mang đề của bạn vào sân</h2>
+
+                <p id="upload-help" class="dashboard-description">
+                    Hiện hỗ trợ file JSON gồm tên đề, thời lượng,
+                    câu hỏi, các lựa chọn và đáp án đúng.
+                </p>
+
+                <form id="upload-exam-form">
+                    <div class="upload-field">
+                        <label for="exam-file">File đề thi</label>
+
+                        <input
+                            type="file"
+                            id="exam-file"
+                            name="examFile"
+                            accept=".json,application/json"
+                            aria-describedby="upload-help"
+                            required
+                        >
+                    </div>
+
+                    <p id="upload-message" role="status"></p>
+
+                    <button
+                        id="preview-exam"
+                        class="primary-button upload-submit"
+                        type="button"
+                        disabled
+                    >
+                        Kiểm tra và xem trước
+                    </button>
+                </form><a class="md-text-link" href="../data/de-toan.json" download>Tải đề JSON mẫu ↓</a>
+            </section>
+
+            <section
+                id="exam-preview"
+                class="upload-card"
+                aria-labelledby="preview-title"
+                hidden
+            >
+                <h2 id="preview-title">Xem trước đề</h2>
+<div class="form-group"><label for="exam-title-input">Tên bài thi</label><input type="text" id="exam-title-input" maxlength="120" placeholder="Ví dụ: Ôn tập Toán — Chương 1" required></div>
+<div class="form-group"><label for="exam-duration-input">Thời gian làm bài (phút)</label><input type="number" id="exam-duration-input" min="1" max="180" step="1" value="60" aria-describedby="exam-duration-help" required><p id="exam-duration-help" class="dashboard-description">Nhập số nguyên từ 1 đến 180 phút.</p></div>
+
+                <p id="preview-summary" class="dashboard-description"></p>
+
+                <div id="preview-questions"></div>
+
+                <button
+                    id="save-exam"
+                    class="primary-button upload-submit"
+                    type="button"
+                    disabled
+                >
+                    Lưu đề
+                </button>
+            </section>
+        </main>
+    <footer class="md-footer"><div class="container"><strong>MATCHDAY<span>★</span></strong><p>Mỗi ngày luyện tập. Một bước tiến xa hơn.</p><span>FOOTBALL INSPIRED · BUILT FOR LEARNING</span></div></footer>
+
+</body>
+</html>
