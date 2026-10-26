@@ -286,6 +286,5 @@ Báo cáo phân tích phải nêu rõ nhóm dữ liệu so sánh. Không suy r�
 
 ## 9. Thành viên
 
-- **Cao Quý Đức**
 - **Đào Hương Giang**
 - **Đoàn Công Tân**
