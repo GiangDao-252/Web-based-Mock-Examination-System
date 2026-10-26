@@ -184,6 +184,8 @@ function initializeReport() {
             " Kết quả được lưu trong trình duyệt, " +
             "chưa được gửi lên máy chủ.";
 
+        window.renderFocusReport(result);
+
         // 8. Chuẩn bị bộ lọc.
         let reviewFilter = reviewSection.querySelector("#review-filter");
         let filterMessage = reviewSection.querySelector(
@@ -283,7 +285,28 @@ function initializeReport() {
             correct.textContent =
                 "Đáp án đúng: " + question.correctAnswer.toUpperCase();
 
-            card.append(title, status, selected, correct);
+            card.append(title, status);
+            if (question.options && answerKeys.every(key => typeof question.options[key] === "string")) {
+                answerKeys.forEach(key => {
+                    const option = document.createElement("p");
+                    option.className = "mvp-choice mvp-math";
+                    option.classList.toggle("is-correct", key === question.correctAnswer);
+                    option.classList.toggle("is-selected", key === question.selectedAnswer);
+                    option.textContent = key.toUpperCase() + ". " + question.options[key] + (key === question.correctAnswer ? " — Đáp án đúng" : "") + (key === question.selectedAnswer ? " — Bạn đã chọn" : "");
+                    card.append(option);
+                });
+            }
+            card.append(selected, correct);
+            title.classList.add("mvp-math");
+            if (typeof question.explanation === "string" && question.explanation.trim()) {
+                const explanation = document.createElement("div"); explanation.className = "mvp-solution";
+                const heading = document.createElement("h4"); heading.textContent = "Lời giải";
+                const body = document.createElement("p"); body.className = "mvp-math"; body.textContent = question.explanation;
+                explanation.append(heading, body); card.append(explanation);
+            } else {
+                const empty = document.createElement("p"); empty.className = "mvp-hint";
+                empty.textContent = "Lượt làm này chưa có lời giải được lưu cho câu hỏi."; card.append(empty);
+            }
 
             reviewCards.push(card);
             fragment.append(card);
@@ -331,6 +354,7 @@ function initializeReport() {
         applyReviewFilter();
 
         reviewSection.hidden = false;
+        window.MatchdayMath.render(reviewSection);
     } catch (error) {
         // 11. Xử lý lỗi.
         resultElements.forEach(function (element) {

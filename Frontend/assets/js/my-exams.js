@@ -1,79 +1,32 @@
 if (document.documentElement.dataset.authBlocked !== "true") {
-const myExamsList = document.querySelector("#my-exams-list");
-
-if (myExamsList) {
+(function () {
+    const list = document.querySelector("#my-exams-list");
     const message = document.querySelector("#my-exams-message");
-
-    try {
-        const savedData = localStorage.getItem("mock-exams");
-
-        const exams = savedData === null
-            ? []
-            : JSON.parse(savedData);
-
-        if (!Array.isArray(exams)) {
-            throw new Error("Danh sách đề không đúng cấu trúc.");
-        }
-
-        const isValid = exams.every(function (exam) {
-            return (
-                exam !== null &&
-                typeof exam === "object" &&
-                typeof exam.id === "string" &&
-                exam.id.length > 0 &&
-                typeof exam.title === "string" &&
-                exam.title.trim().length > 0 &&
-                Number.isInteger(exam.durationMinutes) &&
-                exam.durationMinutes >= 1 &&
-                exam.durationMinutes <= 180 &&
-                Array.isArray(exam.questions) &&
-                exam.questions.length >= 1 &&
-                exam.questions.length <= 100
-            );
-        });
-
-        if (!isValid) {
-            throw new Error("Một số đề đã lưu có thông tin không hợp lệ.");
-        }
-
-        myExamsList.replaceChildren();
-
-        if (exams.length === 0) {
-            message.textContent =
-                "Bạn chưa lưu đề nào. Hãy chọn “Tải thêm đề” để bắt đầu.";
-        } else {
-            message.textContent =
-                "Bạn đã lưu " + exams.length + " đề.";
-
-            exams.forEach(function (exam) {
-                const card = document.createElement("article");
-                card.className = "exam-card";
-
-                const title = document.createElement("h2");
-                title.className = "my-exam-title";
-                title.textContent = exam.title;
-
-                const details = document.createElement("p");
-                details.className = "exam-description";
-
-                details.textContent =
-                    exam.durationMinutes + " phút • " +
-                    exam.questions.length + " câu hỏi";
-
-                const startLink = document.createElement("a");
-
-                startLink.className = "primary-button exam-action";
-                startLink.textContent = "Làm bài";
-                startLink.href = "exam.html?id=" + encodeURIComponent(exam.id);
-                    
-                card.append(title, details, startLink);
-
-                myExamsList.append(card);
+    if (!list || !message) return;
+    function render() {
+        list.replaceChildren();
+        try {
+            const exams = window.ExamStore.readExams(); let count = 0;
+            exams.forEach(exam => {
+                try { window.ExamStore.validate(exam); if (typeof exam.id !== "string" || !exam.id) return; } catch (_) { return; }
+                count++;
+                const card = document.createElement("article"); card.className = "exam-card";
+                const title = document.createElement("h2"); title.textContent = exam.title; title.className = "my-exam-title";
+                const info = document.createElement("p"); info.textContent = exam.durationMinutes + " phút • " + exam.questions.length + " câu • Phiên bản " + window.ExamStore.revision(exam);
+                const actions = document.createElement("div"); actions.className = "mvp-actions";
+                const start = document.createElement("a"); start.className = "primary-button"; start.textContent = "Làm bài"; start.href = "exam.html?id=" + encodeURIComponent(exam.id);
+                const edit = document.createElement("a"); edit.className = "secondary-button"; edit.textContent = "Sửa đề"; edit.href = "upload-exam.html?edit=" + encodeURIComponent(exam.id);
+                const remove = document.createElement("button"); remove.type = "button"; remove.className = "mvp-danger"; remove.textContent = "Xóa đề"; remove.setAttribute("aria-label", "Xóa đề " + exam.title);
+                remove.addEventListener("click", () => {
+                    if (!confirm("Xóa đề “" + exam.title + "”? Các kết quả và bài làm cũ vẫn được giữ lại.")) return;
+                    try { window.ExamStore.remove(exam.id); render(); } catch (_) { message.textContent = "Chưa xóa được đề. Vui lòng thử lại."; }
+                });
+                actions.append(start, edit, remove); card.append(title, info, actions); list.append(card);
             });
-        }
-    } catch (error) {
-        message.textContent =
-            "Không đọc được danh sách đề. " + error.message;
+            message.textContent = count ? "Bạn có " + count + " đề cá nhân trong trình duyệt này." : "Bạn chưa có đề. Hãy tải JSON hoặc tự tạo đề mới.";
+            if (count < exams.length) message.textContent += " Một số đề không hợp lệ chưa được hiển thị.";
+        } catch (error) { message.textContent = "Không đọc được danh sách đề: " + error.message; }
     }
-}
+    render(); window.addEventListener("storage", e => { if (e.key === "mock-exams") render(); });
+})();
 }

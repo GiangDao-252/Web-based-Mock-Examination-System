@@ -38,6 +38,7 @@ if (document.documentElement.dataset.authBlocked !== "true") {
             throw new Error("Không tìm thấy đề đã chọn.");
         }
 
+        window.ExamStore.validate(exam);
         const keys = ["a", "b", "c", "d"];
 
         const isText = function (value) {
@@ -127,7 +128,7 @@ if (document.documentElement.dataset.authBlocked !== "true") {
 
         examNote.textContent =
             exam.questions.length + " câu hỏi • " +
-            exam.durationMinutes + " phút. Thời gian bắt đầu khi mở trang.";
+            exam.durationMinutes + " phút. Đồng hồ chạy sau khi bạn bấm Bắt đầu.";
 
         examForm.dataset.examId = exam.id;
         examForm.examData = exam;

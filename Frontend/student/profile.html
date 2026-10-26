@@ -9,10 +9,14 @@
     <title>Matchday — Trang cá nhân | Thi thử trực tuyến</title>
     
     <script src="../assets/js/club-init.js"></script>
+<link rel="stylesheet" href="../assets/css/mvp.css">
+<script src="../assets/js/exam-store.js" defer></script>
 <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <script src="../assets/js/matchday.js" defer></script>
     <script src="../assets/js/history.js" defer></script>
+<script src="../assets/js/comparison.js" defer></script>
+<script src="../assets/js/profile-settings.js" defer></script>
     <link rel="stylesheet" href="../assets/css/matchday-global.css">
 </head>
 <body class="matchday-page matchday-page md-profile-page">
@@ -68,9 +72,23 @@
             <div class="md-section-heading"><div><p class="md-eyebrow">MATCH HISTORY</p><h2 id="history-title">Những trận đấu gần đây</h2></div><span class="md-section-note">3 LƯỢT GẦN NHẤT</span></div>
             <p id="history-message" role="status" aria-live="polite">Đang đọc lịch sử làm bài…</p>
             <div id="history-list"></div>
-            <noscript><p>Bật JavaScript để xem lịch sử làm bài và chuyển phong cách câu lạc bộ.</p></noscript>
+            <noscript><p>Bật JavaScript để xem lịch sử làm bài.</p></noscript>
         </section>
 
+<section class="mvp-panel" aria-labelledby="comparison-title">
+<p class="md-eyebrow">YOUR PROGRESS</p><h2 id="comparison-title">So sánh lượt luyện tập</h2>
+<div class="mvp-field"><label for="comparison-group">Đề và phiên bản</label><select id="comparison-group" aria-describedby="comparison-message"></select></div>
+<p id="comparison-message" role="status"></p>
+<div class="mvp-scroll" tabindex="0" role="region" aria-label="Bảng so sánh các lượt làm"><table class="mvp-table"><caption>Nhóm theo mã đề, phiên bản, nội dung và thời lượng; điều kiện thực tế của từng lượt có thể khác nhau. Không quy đổi thành thứ hạng.</caption><thead><tr><th scope="col">Lượt</th><th scope="col">Ngày nộp</th><th scope="col">Điểm</th><th scope="col">Đúng</th><th scope="col">Rời trang</th><th scope="col">Kết thúc</th><th scope="col">Bài làm</th></tr></thead><tbody id="comparison-body"></tbody></table></div>
+</section>
+<section class="mvp-panel" aria-labelledby="profile-settings-title">
+<h2 id="profile-settings-title">Thông tin cá nhân</h2>
+<p class="mvp-hint">Tài khoản demo. Thông tin này chỉ được lưu trong trình duyệt; email và mật khẩu thật sẽ được quản lý khi có backend.</p>
+<form id="profile-settings-form"><div class="mvp-grid">
+<div class="mvp-field"><label for="profile-display-name">Tên hiển thị</label><input id="profile-display-name" type="text" maxlength="80" autocomplete="nickname" required></div>
+<div class="mvp-field"><label for="profile-goal">Mục tiêu học tập (không bắt buộc)</label><input id="profile-goal" type="text" maxlength="200"></div></div>
+<button class="primary-button" type="submit">Lưu thông tin</button><p id="profile-settings-message" role="status"></p></form>
+</section>
         <aside class="md-storage" aria-label="Thông tin lưu bài"><span aria-hidden="true">ⓘ</span><p><strong>Tiếp tục phong độ của bạn.</strong> Bài đang làm được khôi phục trong cùng tab. Toàn bộ lịch sử được lưu trong trình duyệt này; xóa dữ liệu trang web sẽ xóa lịch sử.</p></aside>
         
     </main>

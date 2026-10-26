@@ -9,10 +9,15 @@
         <title>Kết quả bài thi</title>
     <meta name="theme-color" content="#DB0007">
     <script src="../assets/js/club-init.js"></script>
+<link rel="stylesheet" href="../assets/css/mvp.css">
+<script src="../assets/js/exam-store.js" defer></script>
+<script src="../assets/js/math-render.js" defer></script>
+<script src="../assets/vendor/mathjax/tex-svg.js" defer></script>
 
         <link rel="stylesheet" href="../assets/css/style.css">
         <link rel="stylesheet" href="../assets/css/dashboard.css">
-        <script src="../assets/js/report.js" defer></script>
+        <script src="../assets/js/focus-report.js" defer></script>
+<script src="../assets/js/report.js" defer></script>
         <link rel="stylesheet" href="../assets/css/matchday-global.css">
     <script src="../assets/js/matchday.js" defer></script>
 </head>
@@ -32,6 +37,13 @@
 <div class="report-stat"><dt>Số câu đúng</dt><dd id="report-correct">—</dd></div>
 <div class="report-stat"><dt>Số câu sai</dt><dd id="report-wrong">—</dd></div>
 <div class="report-stat"><dt>Số lần rời trang</dt><dd id="report-page-leaves">—</dd></div></dl><p class="dashboard-description">Mỗi câu có trọng số bằng nhau. Câu sai hoặc bỏ trống không được tính điểm.</p></section>
+<section id="focus-report" class="mvp-panel" aria-labelledby="focus-title" hidden>
+<h2 id="focus-title">Trạng thái kết thúc và sự tập trung</h2>
+<p id="report-exam-version"></p><p><strong id="report-finish-state"></strong></p><p id="report-timings"></p>
+<p>Chỉ số ghi nhận khi trang thi bị ẩn, không xác định nguyên nhân và không làm thay đổi điểm số.</p>
+<p id="focus-events-message"></p><div id="focus-table-wrap" class="mvp-scroll" tabindex="0" role="region" aria-label="Nhật ký rời trang"><table class="mvp-table"><caption>Nhật ký ghi nhận trong lượt làm bài</caption><thead><tr><th scope="col">Lần</th><th scope="col">Trang bị ẩn</th><th scope="col">Quay lại</th><th scope="col">Khoảng thời gian</th></tr></thead><tbody id="focus-events-body"></tbody></table></div>
+</section>
+<p id="math-status" role="status"></p>
 <section id="answer-review" class="profile-card" aria-labelledby="review-title" hidden><p class="md-eyebrow">POST-MATCH REVIEW</p><h2 id="review-title">Xem lại bài làm</h2><div class="review-filter"><label for="review-filter">Hiển thị câu hỏi</label><select id="review-filter"><option value="all">Tất cả câu hỏi</option><option value="correct">Câu đúng</option><option value="wrong">Câu sai</option><option value="unanswered">Câu chưa trả lời</option></select></div><p id="review-filter-message" role="status"></p><div id="review-list"></div></section>
 <div class="md-report-actions"><a class="primary-button" href="profile.html">Về trang cá nhân →</a><a class="secondary-button" href="my-exams.html">Chọn đề tiếp theo</a></div></main>
     <footer class="md-footer"><div class="container"><strong>MATCHDAY<span>★</span></strong><p>Mỗi ngày luyện tập. Một bước tiến xa hơn.</p><span>FOOTBALL INSPIRED · BUILT FOR LEARNING</span></div></footer>

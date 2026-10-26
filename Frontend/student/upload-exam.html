@@ -9,6 +9,10 @@
         <title>Tải đề lên</title>
     <meta name="theme-color" content="#DB0007">
     <script src="../assets/js/club-init.js"></script>
+<link rel="stylesheet" href="../assets/css/mvp.css">
+<script src="../assets/js/exam-store.js" defer></script>
+<script src="../assets/js/math-render.js" defer></script>
+<script src="../assets/vendor/mathjax/tex-svg.js" defer></script>
 
         <link rel="stylesheet" href="../assets/css/style.css">
         <link rel="stylesheet" href="../assets/css/dashboard.css">
@@ -35,64 +39,34 @@
                 Xem đề của tôi
             </a>
 
-            <section class="upload-card" aria-labelledby="upload-title">
-                <span class="md-upload-icon" aria-hidden="true">↑</span><p class="md-eyebrow">01 / CHỌN ĐỀ</p><h2 id="upload-title">Mang đề của bạn vào sân</h2>
-
-                <p id="upload-help" class="dashboard-description">
-                    Hiện hỗ trợ file JSON gồm tên đề, thời lượng,
-                    câu hỏi, các lựa chọn và đáp án đúng.
-                </p>
-
-                <form id="upload-exam-form">
-                    <div class="upload-field">
-                        <label for="exam-file">File đề thi</label>
-
-                        <input
-                            type="file"
-                            id="exam-file"
-                            name="examFile"
-                            accept=".json,application/json"
-                            aria-describedby="upload-help"
-                            required
-                        >
-                    </div>
-
-                    <p id="upload-message" role="status"></p>
-
-                    <button
-                        id="preview-exam"
-                        class="primary-button upload-submit"
-                        type="button"
-                        disabled
-                    >
-                        Kiểm tra và xem trước
-                    </button>
-                </form><a class="md-text-link" href="../data/de-toan.json" download>Tải đề JSON mẫu ↓</a>
-            </section>
-
-            <section
-                id="exam-preview"
-                class="upload-card"
-                aria-labelledby="preview-title"
-                hidden
-            >
-                <h2 id="preview-title">Xem trước đề</h2>
-<div class="form-group"><label for="exam-title-input">Tên bài thi</label><input type="text" id="exam-title-input" maxlength="120" placeholder="Ví dụ: Ôn tập Toán — Chương 1" required></div>
-<div class="form-group"><label for="exam-duration-input">Thời gian làm bài (phút)</label><input type="number" id="exam-duration-input" min="1" max="180" step="1" value="60" aria-describedby="exam-duration-help" required><p id="exam-duration-help" class="dashboard-description">Nhập số nguyên từ 1 đến 180 phút.</p></div>
-
-                <p id="preview-summary" class="dashboard-description"></p>
-
-                <div id="preview-questions"></div>
-
-                <button
-                    id="save-exam"
-                    class="primary-button upload-submit"
-                    type="button"
-                    disabled
-                >
-                    Lưu đề
-                </button>
-            </section>
+            <section class="mvp-panel" aria-labelledby="import-title">
+<h2 id="import-title">Nhập từ file JSON</h2>
+<p>MVP hỗ trợ JSON tối đa 1 MB, từ 1 đến 100 câu trắc nghiệm A–D. Bạn cũng có thể tạo đề trực tiếp ở bên dưới. PDF và Word chưa được hỗ trợ.</p>
+<div class="mvp-field"><label for="exam-file">File đề thi JSON</label><input type="file" id="exam-file" accept=".json,application/json"></div>
+<button type="button" class="secondary-button" id="import-exam">Đọc file và chỉnh sửa</button>
+<a class="md-text-link" href="../data/de-toan.json" download>Tải JSON mẫu có công thức và lời giải ↓</a>
+</section>
+<section class="mvp-panel" aria-labelledby="editor-title">
+<h2 id="editor-title">Tạo và chỉnh sửa đề</h2>
+<p id="upload-message" role="status" aria-live="polite"></p>
+<p id="math-help" class="mvp-hint">Công thức cùng dòng: <code>\( \frac{1}{2} \)</code>. Công thức riêng dòng: <code>\[ \int_0^1 x^2\,dx \]</code>. Nhấn “Xem trước” để kiểm tra công thức. Mỗi câu bằng điểm; câu sai và bỏ trống không được tính điểm.</p>
+<form id="exam-editor-form" aria-describedby="math-help">
+<div class="mvp-grid">
+<div class="mvp-field"><label for="exam-title-input">Tên bài thi</label><input id="exam-title-input" type="text" maxlength="120" required></div>
+<div class="mvp-field"><label for="exam-duration-input">Thời lượng (phút)</label><input id="exam-duration-input" type="number" min="1" max="180" step="1" value="60" required></div>
+</div>
+<div id="question-editor"></div>
+<div class="mvp-actions">
+<button type="button" id="add-question" class="secondary-button">Thêm câu hỏi</button>
+<button type="button" id="preview-exam" class="secondary-button">Xem trước</button>
+<button type="submit" id="save-exam" class="primary-button">Lưu đề</button>
+<a id="saved-exam-link" class="secondary-button" hidden>Vào luyện tập →</a>
+</div>
+</form>
+</section>
+<section id="exam-preview" class="mvp-panel" aria-labelledby="preview-title" hidden>
+<h2 id="preview-title">Xem trước đề</h2><p id="preview-summary"></p><p id="math-status" role="status"></p><div id="preview-questions"></div>
+</section>
         </main>
     <footer class="md-footer"><div class="container"><strong>MATCHDAY<span>★</span></strong><p>Mỗi ngày luyện tập. Một bước tiến xa hơn.</p><span>FOOTBALL INSPIRED · BUILT FOR LEARNING</span></div></footer>
 

@@ -2,7 +2,39 @@ if (document.documentElement.dataset.authBlocked !== "true") {
 const examForm = document.querySelector("#exam-form");
 
 if (examForm && examForm.dataset.loadError !== "true") {
-    initializeExam();
+    prepareExam();
+}
+
+function examIdentity(exam) {
+    return JSON.stringify([exam.id, window.ExamStore.revision(exam), window.ExamStore.fingerprint(exam)]);
+}
+function prepareExam() {
+    const exam = examForm.examData;
+    const gate = document.querySelector("#exam-preflight");
+    const layout = document.querySelector(".exam-layout");
+    const monitorPanel = document.querySelector(".exam-monitor");
+    const timer = document.querySelector(".exam-header");
+    const startButton = document.querySelector("#start-exam");
+    if (!exam || !gate || !startButton) return;
+    timer.hidden = true; layout.hidden = true; monitorPanel.hidden = true;
+    document.querySelector("#preflight-summary").textContent = exam.title + " • Phiên bản " + window.ExamStore.revision(exam) + " • " + exam.questions.length + " câu • " + exam.durationMinutes + " phút.";
+    let draft = null;
+    try { draft = JSON.parse(sessionStorage.getItem("mock-exam-draft")); } catch (_) { /* The gate stays usable. */ }
+    function start() {
+        gate.hidden = true; timer.hidden = false; layout.hidden = false; monitorPanel.hidden = false;
+        initializeExam();
+        window.MatchdayMath.render(examForm);
+    }
+    if (draft && draft.examSignature === examIdentity(exam)) {
+        // Resume immediately: the original deadline continues, including elapsed time away.
+        start(); return;
+    }
+    gate.hidden = false;
+    if (draft) document.querySelector("#preflight-message").textContent = "Có tiến độ của đề hoặc phiên bản khác trong tab này. Bắt đầu lượt mới sẽ thay tiến độ đó.";
+    startButton.addEventListener("click", function () {
+        if (draft && !confirm("Bắt đầu lượt mới và thay tiến độ đang lưu trong tab này?")) return;
+        startButton.disabled = true; start();
+    }, {once: false});
 }
 
 function initializeExam() {
@@ -172,23 +204,9 @@ function initializeExam() {
         return card.dataset.question;
     });
 
-    const questionTexts = questionCards.map(function (card) {
-        return card.querySelector("legend").textContent.trim();
-    });
-
-    const examSignature = JSON.stringify({
-        title: examTitle,
-        durationMinutes: durationMinutes,
-        questions: questionCards.map(function (card, index) {
-            return {
-                text: card.textContent.trim(),
-                correctAnswer: correctAnswers[index],
-                choices: radioGroups[index].map(function (input) {
-                    return input.value;
-                })
-            };
-        })
-    });
+    // Keep original source text; MathJax-generated DOM must never enter a saved snapshot.
+    const questionTexts = examData.questions.map((q, i) => "Câu " + (i + 1) + ". " + q.text);
+    const examSignature = examIdentity(examData);
 
     const monitor =
         window.examMonitor &&
@@ -198,7 +216,9 @@ function initializeExam() {
             ? window.examMonitor
             : null;
 
-    let deadline = Date.now() + durationMilliseconds;
+    let startedAt = Date.now();
+    let attemptId = crypto.randomUUID();
+    let deadline = startedAt + durationMilliseconds;
     let currentQuestion = questionNumbers[0];
     let selectedAnswers = questionCards.map(function () {
         return null;
@@ -207,6 +227,7 @@ function initializeExam() {
     let isSubmitted = false;
     let timerInterval = null;
     let restoredLeaveCount = 0;
+    let restoredLeaveEvents = [];
     let monitorStarted = false;
 
     const flaggedQuestions = new Set();
@@ -282,10 +303,13 @@ function initializeExam() {
             version: 1,
             examSignature: examSignature,
             deadline: deadline,
+            startedAt: startedAt,
+            attemptId: attemptId,
             selectedAnswers: selectedAnswers.slice(),
             flaggedQuestions: Array.from(flaggedQuestions),
             currentQuestion: currentQuestion,
-            pageLeaveCount: getPageLeaveCount()
+            pageLeaveCount: getPageLeaveCount(),
+            leaveEvents: monitorStarted && monitor.getEvents ? monitor.getEvents() : restoredLeaveEvents
         };
 
         try {
@@ -349,6 +373,9 @@ function initializeExam() {
             }
 
             deadline = draft.deadline;
+            startedAt = Number.isSafeInteger(draft.startedAt) ? draft.startedAt : deadline - durationMilliseconds;
+            attemptId = typeof draft.attemptId === "string" ? draft.attemptId : attemptId;
+            restoredLeaveEvents = Array.isArray(draft.leaveEvents) ? draft.leaveEvents : [];
             currentQuestion = draft.currentQuestion;
             selectedAnswers = draft.selectedAnswers.slice();
             restoredLeaveCount = draft.pageLeaveCount;
@@ -468,7 +495,7 @@ function initializeExam() {
         clearInterval(timerInterval);
 
         if (monitorStarted) {
-            monitor.stop();
+            monitor.stop(reason === "timeout" ? deadline : Date.now());
         }
 
         renderSelectedAnswers();
@@ -510,7 +537,13 @@ function initializeExam() {
 
         const result = {
             version: 1,
-            attemptId: crypto.randomUUID(),
+            attemptId: attemptId,
+            startedAt: new Date(startedAt).toISOString(),
+            endedAt: new Date(reason === "timeout" ? deadline : Date.now()).toISOString(),
+            durationMinutes: durationMinutes,
+            examId: examData.id,
+            examVersion: window.ExamStore.revision(examData),
+            examFingerprint: window.ExamStore.fingerprint(examData),
             submittedAt: new Date().toISOString(),
             examTitle: examTitle,
             totalQuestions: questionCards.length,
@@ -524,12 +557,15 @@ function initializeExam() {
                     questionNumber: index + 1,
                     questionText: questionTexts[index],
                     selectedAnswer: selectedAnswers[index],
-                    correctAnswer: correctAnswers[index]
+                    correctAnswer: correctAnswers[index],
+                    options: {...examData.questions[index].options},
+                    explanation: examData.questions[index].explanation || ""
                 };
             }),
 
             reason: reason,
-            pageLeaveCount: pageLeaveCount
+            pageLeaveCount: pageLeaveCount,
+            leaveEvents: monitorStarted && monitor.getEvents ? monitor.getEvents() : restoredLeaveEvents
         };
 
         let resultSaved = false;
@@ -765,7 +801,9 @@ function initializeExam() {
                 return !isSubmitted && Date.now() < deadline;
             },
             restoredLeaveCount,
-            saveDraft
+            saveDraft,
+            restoredLeaveEvents,
+            deadline
         );
 
         monitorStarted = true;

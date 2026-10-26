@@ -1,26 +1,28 @@
 {
-    "title": "Đề luyện tập Toán",
-    "durationMinutes": 30,
-    "questions": [
-        {
-            "text": "Giá trị của 2 + 3 là bao nhiêu?",
-            "options": {
-                "a": "4",
-                "b": "5",
-                "c": "6",
-                "d": "7"
-            },
-            "correctAnswer": "b"
-        },
-        {
-            "text": "Giá trị của 3 × 4 là bao nhiêu?",
-            "options": {
-                "a": "7",
-                "b": "10",
-                "c": "12",
-                "d": "14"
-            },
-            "correctAnswer": "c"
-        }
-    ]
+  "title": "Toán học — Công thức và lời giải",
+  "durationMinutes": 15,
+  "questions": [
+    {
+      "text": "Tính tích phân \\( \\int_0^1 x^2\\,dx \\).",
+      "options": {
+        "a": "\\( \\frac{1}{2} \\)",
+        "b": "\\( \\frac{1}{3} \\)",
+        "c": "\\( 1 \\)",
+        "d": "\\( 2 \\)"
+      },
+      "correctAnswer": "b",
+      "explanation": "Nguyên hàm là \\( \\frac{x^3}{3} \\). Do đó \\[ \\int_0^1 x^2\\,dx=\\left[\\frac{x^3}{3}\\right]_0^1=\\frac{1}{3}. \\]"
+    },
+    {
+      "text": "Cho \\( A=\\begin{pmatrix}1 & 2\\\\3 & 4\\end{pmatrix} \\). Tính \\( \\det(A) \\).",
+      "options": {
+        "a": "2",
+        "b": "10",
+        "c": "−2",
+        "d": "−10"
+      },
+      "correctAnswer": "c",
+      "explanation": "Với ma trận cấp hai, \\( \\det(A)=ad-bc=1\\times4-2\\times3=-2 \\)."
+    }
+  ]
 }

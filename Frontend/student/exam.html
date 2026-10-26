@@ -9,6 +9,10 @@
         <title>Làm bài thi thử</title>
     <meta name="theme-color" content="#DB0007">
     <script src="../assets/js/club-init.js"></script>
+<link rel="stylesheet" href="../assets/css/mvp.css">
+<script src="../assets/js/exam-store.js" defer></script>
+<script src="../assets/js/math-render.js" defer></script>
+<script src="../assets/vendor/mathjax/tex-svg.js" defer></script>
 
         <link rel="stylesheet" href="../assets/css/style.css">
         <link rel="stylesheet" href="../assets/css/exam.css">
@@ -40,12 +44,12 @@
             <p class="md-eyebrow">MATCH IN PROGRESS</p><h1>Thi thử Toán học</h1>
 
             <p class="exam-note">
-                Bài mẫu gồm ba câu hỏi. Thời gian làm bài bắt đầu khi mở trang.
+                Chọn một đề để bắt đầu luyện tập.
             </p>
             
             <p id="timer-message" class="exam-note" role="status"></p>
 
-            <div class="exam-monitor">
+            <div class="exam-monitor" hidden>
                 <p>
                     Số lần rời trang thi được ghi nhận:
                     <strong id="page-leave-count">0</strong>
@@ -55,7 +59,16 @@
             </div>
 
             <p id="exam-save-message" role="status"></p>
-            <div class="exam-layout">
+            <section id="exam-preflight" class="mvp-panel" aria-labelledby="preflight-title" hidden>
+<h2 id="preflight-title">Sẵn sàng bắt đầu?</h2>
+<p id="preflight-summary"></p>
+<ul><li>Đồng hồ chỉ chạy sau khi bạn bấm “Bắt đầu”. Khi đã bắt đầu, tải lại trang hoặc rời tab không làm dừng đồng hồ.</li>
+<li>Hệ thống ghi nhận số lần và thời điểm trang thi bị ẩn/quay lại, chẳng hạn khi đổi tab hoặc thu nhỏ cửa sổ. Chỉ số dùng để bạn tự đánh giá sự tập trung; không chặn thao tác và không trừ điểm.</li>
+<li>Mỗi câu có trọng số bằng nhau. Câu sai hoặc bỏ trống không được tính điểm. Thang điểm 10.</li></ul>
+<p id="preflight-message" role="status"></p><button id="start-exam" type="button" class="primary-button">Bắt đầu</button>
+<a href="exams.html" class="secondary-button">Chọn đề khác</a></section>
+<p id="math-status" role="status"></p>
+<div class="exam-layout" hidden>
                 <aside class="question-navigation" aria-labelledby="navigation-title">
                     <h2 id="navigation-title">Câu hỏi</h2>
             
