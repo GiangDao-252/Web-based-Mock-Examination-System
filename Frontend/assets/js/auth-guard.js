@@ -12,5 +12,20 @@
         return false;
     }
     window.MatchdayRequireLogin = requireLogin;
-    requireLogin();
+    if (window.MatchdayAuth.apiMode) {
+        document.documentElement.style.visibility = "hidden";
+        window.MatchdayAuth.ready.then(function () {
+            if (requireLogin()) document.documentElement.style.visibility = "";
+        }).catch(function () {
+            document.addEventListener("DOMContentLoaded", showFailure, {once: true});
+            if (document.readyState !== "loading") showFailure();
+        });
+    } else requireLogin();
+    function showFailure() {
+        document.documentElement.style.visibility = "";
+        document.body.replaceChildren();
+        const text = document.createElement("p"); text.textContent = "Không xác minh được phiên với backend. Kiểm tra kết nối rồi tải lại trang.";
+        const retry = document.createElement("button"); retry.textContent = "Thử lại"; retry.onclick = function () { location.reload(); };
+        document.body.append(text, retry);
+    }
 })();

@@ -1,4 +1,5 @@
-if (document.documentElement.dataset.authBlocked !== "true") {
+window.MatchdayAuth.ready.then(function () {
+if (!window.MatchdayAuth.getSession()) return;
 (function () {
     "use strict";
     const select = document.querySelector("#comparison-group");
@@ -47,4 +48,4 @@ if (document.documentElement.dataset.authBlocked !== "true") {
         select.addEventListener("change", render); render();
     } catch (error) { select.disabled = true; message.textContent = "Không đọc được dữ liệu so sánh: " + error.message; }
 })();
-}
+}).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });

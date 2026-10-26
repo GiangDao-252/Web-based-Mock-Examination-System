@@ -1,4 +1,5 @@
-if (document.documentElement.dataset.authBlocked !== "true") {
+window.MatchdayAuth.ready.then(function () {
+if (!window.MatchdayAuth.getSession()) return;
 (function () {
     const examForm = document.querySelector("#exam-form");
 
@@ -143,4 +144,4 @@ if (document.documentElement.dataset.authBlocked !== "true") {
             " Hãy quay lại mục “Đề của tôi”.";
     }
 })();
-}
+}).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });

@@ -1,4 +1,5 @@
-if (document.documentElement.dataset.authBlocked !== "true") {
+window.MatchdayAuth.ready.then(function () {
+if (!window.MatchdayAuth.getSession()) return;
 (function () {
     "use strict";
     const list = document.querySelector("#history-list");
@@ -53,4 +54,4 @@ if (document.documentElement.dataset.authBlocked !== "true") {
     }
 })();
 
-}
+}).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });

@@ -1,4 +1,5 @@
-if (document.documentElement.dataset.authBlocked !== "true") {
+window.MatchdayAuth.ready.then(function () {
+if (!window.MatchdayAuth.getSession()) return;
 const reportMessage = document.querySelector("#report-message");
 
 if (reportMessage) {
@@ -371,4 +372,4 @@ function initializeReport() {
         console.error(error);
     }
 }
-}
+}).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });

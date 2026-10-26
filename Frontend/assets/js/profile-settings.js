@@ -1,4 +1,5 @@
-if (document.documentElement.dataset.authBlocked !== "true") {
+window.MatchdayAuth.ready.then(function () {
+if (!window.MatchdayAuth.getSession()) return;
 (function () {
     "use strict";
     const form = document.querySelector("#profile-settings-form");
@@ -25,4 +26,4 @@ if (document.documentElement.dataset.authBlocked !== "true") {
     });
     name.addEventListener("input", () => name.setCustomValidity(""));
 })();
-}
+}).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });

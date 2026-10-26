@@ -1,4 +1,5 @@
-if (document.documentElement.dataset.authBlocked !== "true") {
+window.MatchdayAuth.ready.then(function () {
+if (!window.MatchdayAuth.getSession()) return;
 const examForm = document.querySelector("#exam-form");
 
 if (examForm && examForm.dataset.loadError !== "true") {
@@ -817,4 +818,4 @@ function initializeExam() {
         saveDraft();
     }
 }
-}
+}).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });

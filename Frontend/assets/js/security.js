@@ -1,4 +1,5 @@
-if (document.documentElement.dataset.authBlocked !== "true") {
+window.MatchdayAuth.ready.then(function () {
+if (!window.MatchdayAuth.getSession()) return;
 window.examMonitor = (function () {
     "use strict";
     let count = 0, active = false, events = [], endTime = Infinity;
@@ -48,4 +49,4 @@ window.examMonitor = (function () {
     }
     return {start, stop, getLeaveCount: () => count, getEvents: () => events.map(e => ({...e}))};
 })();
-}
+}).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });

@@ -1,4 +1,5 @@
-if (document.documentElement.dataset.authBlocked !== "true") {
+window.MatchdayAuth.ready.then(function () {
+if (!window.MatchdayAuth.getSession()) return;
 (function () {
     const list = document.querySelector("#my-exams-list");
     const message = document.querySelector("#my-exams-message");
@@ -29,4 +30,4 @@ if (document.documentElement.dataset.authBlocked !== "true") {
     }
     render(); window.addEventListener("storage", e => { if (e.key === "mock-exams") render(); });
 })();
-}
+}).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });

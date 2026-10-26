@@ -7,7 +7,7 @@ if (registerForm) {
     const message = registerForm.querySelector("#register-message");
     const submitButton = registerForm.querySelector(".auth-submit");
 
-    registerForm.addEventListener("submit", function(event) {
+    registerForm.addEventListener("submit", async function(event) {
         event.preventDefault();
 
         message.textContent = "";
@@ -30,7 +30,20 @@ if (registerForm) {
             return;
         }
 
-        message.textContent = "Thông tin hợp lệ. Chưa tạo tài khoản vì chưa kết nối máy chủ";
+        if (!window.MatchdayAuth.apiMode) {
+            message.textContent = "Thông tin hợp lệ. Chế độ demo chưa tạo tài khoản thật.";
+            return;
+        }
+        submitButton.disabled = true;
+        try {
+            await window.MatchdayAPI.request("/register", {method: "POST", auth: false, body: {
+                email: registerForm.querySelector('input[type="email"]').value.trim(),
+                display_name: fullNameInput.value.trim(), password: passwordInput.value
+            }});
+            message.textContent = "Đã đăng ký thành công. Bạn có thể sang trang đăng nhập.";
+            registerForm.reset();
+        } catch (error) { message.textContent = error.message; }
+        finally { submitButton.disabled = false; }
     });
 
     registerForm.addEventListener("input", function(){
@@ -70,19 +83,25 @@ if (loginForm) {
     const message = loginForm.querySelector("#login-message");
     const submitButton = loginForm.querySelector(".auth-submit");
 
-    loginForm.addEventListener("submit", function (event) {
+    loginForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         try {
             const email = loginForm.querySelector("#email").value;
             const password = loginForm.querySelector("#password").value;
-            if (!window.MatchdayAuth.loginDemo(email, password)) {
+            if (window.MatchdayAuth.apiMode) {
+                submitButton.disabled = true;
+                await window.MatchdayAPI.login(email, password);
+                await window.MatchdayAPI.request("/me");
+            } else if (!window.MatchdayAuth.loginDemo(email, password)) {
                 message.textContent = "Tài khoản demo chưa đúng. Dùng thông tin mô phỏng hiển thị phía trên.";
                 return;
             }
             window.location.replace(window.MatchdayAuth.getNextPage());
         } catch (error) {
-            message.textContent = "Không tạo được phiên demo trong tab này. Vui lòng cho phép lưu dữ liệu trang web.";
+            message.textContent = error.message || "Không đăng nhập được.";
+        } finally {
+            submitButton.disabled = false;
         }
     });
     loginForm.addEventListener("input", function () {
@@ -198,4 +217,9 @@ if (fillDemoButton && loginForm) {
         loginForm.querySelector("#password").value = "Matchday123!";
         loginForm.querySelector("#login-message").textContent = "Đã điền tài khoản mô phỏng. Bấm Đăng nhập demo để tiếp tục.";
     });
+}
+
+if (window.MatchdayAuth.apiMode) {
+    document.querySelectorAll(".md-demo-notice").forEach(el => el.hidden = true);
+    if (loginForm) loginForm.querySelector(".auth-submit").textContent = "Đăng nhập";
 }
