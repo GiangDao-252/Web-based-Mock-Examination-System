@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi" data-club="arsenal" data-requires-auth="true">
+    <head>
+        <meta charset="UTF-8">
+<script src="../assets/js/api-config.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/auth-session.js"></script>
+<script src="../assets/js/auth-guard.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Tải đề lên</title>
+    <meta name="theme-color" content="#DB0007">
+    <script src="../assets/js/club-init.js"></script>
+<link rel="stylesheet" href="../assets/css/mvp.css">
+<script src="../assets/js/exam-store.js" defer></script>
+<script src="../assets/js/math-render.js" defer></script>
+<script src="../assets/vendor/mathjax/tex-svg.js" defer></script>
+
+        <link rel="stylesheet" href="../assets/css/style.css">
+        <link rel="stylesheet" href="../assets/css/dashboard.css">
+        <link rel="stylesheet" href="../assets/css/upload.css">
+        <script src="../assets/js/upload-exam.js" defer></script>
+        <link rel="stylesheet" href="../assets/css/matchday-global.css">
+    <script src="../assets/js/matchday.js" defer></script>
+</head>
+
+    <body class="dashboard-page matchday-page md-upload-page">
+<a class="md-skip" href="#main-content">Đến nội dung chính</a>
+        <header class="md-header"><div class="container md-header-inner"><a class="md-brand" href="../index.html" aria-label="Matchday — Trang chủ"><span class="md-brand-mark" aria-hidden="true">M<span>★</span></span><span>MATCHDAY<small>THI THỬ TRỰC TUYẾN</small></span></a><nav class="md-nav" aria-label="Điều hướng chính"><a href="../index.html">Trang chủ</a><a href="../student/profile.html">Trang cá nhân</a><a href="../student/exams.html">Đề mẫu</a><a href="../student/my-exams.html">Đề của tôi</a><a href="../student/upload-exam.html" aria-current="page">Tải đề thi</a></nav><button class="md-account" type="button">Đăng xuất <span aria-hidden="true">↗</span></button></div></header><div class="container md-theme-bar"><span class="md-breadcrumb">TACTICS ROOM / TẢI ĐỀ</span></div>
+
+        <main class="container student-main" id="main-content">
+            <p class="md-eyebrow">TACTICS ROOM</p><h1>Chuẩn bị đề. Sẵn sàng vào sân.</h1>
+
+            
+
+            <p class="dashboard-description">
+                Chọn file đề để kiểm tra nội dung trước khi lưu.
+            </p>
+
+            <a class="secondary-button" href="my-exams.html">
+                Xem đề của tôi
+            </a>
+
+            <section class="mvp-panel" aria-labelledby="import-title">
+<h2 id="import-title">Nhập từ file JSON</h2>
+<p>MVP hỗ trợ JSON tối đa 1 MB, từ 1 đến 100 câu trắc nghiệm A–D. Bạn cũng có thể tạo đề trực tiếp ở bên dưới. PDF và Word chưa được hỗ trợ.</p>
+<div class="mvp-field"><label for="exam-file">File đề thi JSON</label><input type="file" id="exam-file" accept=".json,application/json"></div>
+<button type="button" class="secondary-button" id="import-exam">Đọc file và chỉnh sửa</button>
+<a class="md-text-link" href="../data/de-toan.json" download>Tải JSON mẫu có công thức và lời giải ↓</a>
+</section>
+<section class="mvp-panel" aria-labelledby="editor-title">
+<h2 id="editor-title">Tạo và chỉnh sửa đề</h2>
+<p id="upload-message" role="status" aria-live="polite"></p>
+<p id="math-help" class="mvp-hint">Công thức cùng dòng: <code>\( \frac{1}{2} \)</code>. Công thức riêng dòng: <code>\[ \int_0^1 x^2\,dx \]</code>. Nhấn “Xem trước” để kiểm tra công thức. Mỗi câu bằng điểm; câu sai và bỏ trống không được tính điểm.</p>
+<form id="exam-editor-form" aria-describedby="math-help">
+<div class="mvp-grid">
+<div class="mvp-field"><label for="exam-title-input">Tên bài thi</label><input id="exam-title-input" type="text" maxlength="120" required></div>
+<div class="mvp-field"><label for="exam-duration-input">Thời lượng (phút)</label><input id="exam-duration-input" type="number" min="1" max="180" step="1" value="60" required></div>
+</div>
+<div id="question-editor"></div>
+<div class="mvp-actions">
+<button type="button" id="add-question" class="secondary-button">Thêm câu hỏi</button>
+<button type="button" id="preview-exam" class="secondary-button">Xem trước</button>
+<button type="submit" id="save-exam" class="primary-button">Lưu đề</button>
+<a id="saved-exam-link" class="secondary-button" hidden>Vào luyện tập →</a>
+</div>
+</form>
+</section>
+<section id="exam-preview" class="mvp-panel" aria-labelledby="preview-title" hidden>
+<h2 id="preview-title">Xem trước đề</h2><p id="preview-summary"></p><p id="math-status" role="status"></p><div id="preview-questions"></div>
+</section>
+        </main>
+    <footer class="md-footer"><div class="container"><strong>MATCHDAY<span>★</span></strong><p>Mỗi ngày luyện tập. Một bước tiến xa hơn.</p><span>FOOTBALL INSPIRED · BUILT FOR LEARNING</span></div></footer>
+
+</body>
+</html>

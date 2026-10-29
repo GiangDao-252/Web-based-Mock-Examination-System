@@ -1,0 +1,265 @@
+/* Bảng màu dùng chung */
+:root {
+    --strong-red: #EF0107;
+    --dark-red: #DB0007;
+    --aztec-blue: #063672;
+    --arsenal-gold: #9C824A;
+
+    --sky-blue: #6CABDD;
+    --dark-navy: #1C2C5B;
+    --gold: #FFC659;
+    --dark-gold: #D4A12A;
+    --lava-red: #EC3325;
+    --white: #FFFFFF;
+
+    /* Các sắc nền nhạt để nội dung dễ đọc */
+    --page-background: #F3F8FC;
+    --blue-background: #EAF3FA;
+    --gold-background: #FFF7E5;
+    --red-background: #FFF0EE;
+
+    --border-color: #D4E2EE;
+    --muted-text: #465677;
+}
+
+/* Trang và nội dung */
+body {
+    background-color: var(--page-background);
+    color: var(--dark-navy);
+}
+
+h1,
+h2,
+h3,
+h4 {
+    color: var(--dark-navy);
+}
+
+a {
+    color: var(--aztec-blue);
+}
+
+a:hover {
+    color: var(--dark-red);
+}
+
+.dashboard-description,
+.history-card p,
+#review-filter-message {
+    color: var(--muted-text);
+}
+
+/* Header và footer */
+.site-header,
+.site-footer {
+    background-color: var(--aztec-blue);
+    color: var(--white);
+}
+
+.site-header .logo,
+.site-header nav a,
+.site-footer a,
+.site-footer p {
+    color: var(--white);
+}
+
+.site-header nav a:hover,
+.site-header nav a[aria-current="page"],
+.site-footer a:hover {
+    color: var(--gold);
+}
+
+/* Các khối nội dung */
+.profile-card,
+.question-card {
+    background-color: var(--white);
+    border-color: var(--border-color);
+}
+
+.history-card,
+.review-card,
+.report-stat {
+    background-color: var(--blue-background);
+    border-color: var(--border-color);
+}
+
+.report-stat dt {
+    color: var(--muted-text);
+}
+
+.report-stat dd {
+    color: var(--aztec-blue);
+}
+
+/* Nút hành động */
+.button,
+.history-view-button,
+.dashboard-actions .dashboard-button,
+#submit-exam,
+button[type="submit"] {
+    background-color: var(--dark-red);
+    border-color: var(--dark-red);
+    color: var(--white);
+}
+
+.button:hover,
+.history-view-button:hover,
+.dashboard-actions .dashboard-button:hover,
+#submit-exam:hover,
+button[type="submit"]:hover {
+    background-color: var(--strong-red);
+    border-color: var(--strong-red);
+    color: var(--white);
+}
+
+/* Nút phụ */
+.dashboard-actions .dashboard-button-secondary,
+#previous-question,
+#next-question {
+    background-color: var(--white);
+    border: 1px solid var(--aztec-blue);
+    color: var(--aztec-blue);
+}
+
+.dashboard-actions .dashboard-button-secondary:hover,
+#previous-question:hover,
+#next-question:hover {
+    background-color: var(--blue-background);
+    border-color: var(--aztec-blue);
+    color: var(--aztec-blue);
+}
+
+/* Ô nhập và bộ lọc */
+input,
+select,
+textarea {
+    border-color: var(--border-color);
+    color: var(--dark-navy);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--aztec-blue);
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    accent-color: var(--aztec-blue);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.dashboard-actions .dashboard-button:focus-visible,
+.history-view-button:focus-visible,
+.review-filter select:focus-visible {
+    outline: 3px solid var(--sky-blue);
+    outline-offset: 3px;
+}
+
+/* Bảng điều hướng câu hỏi */
+.question-button {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    color: var(--dark-navy);
+}
+
+.question-button:hover {
+    border-color: var(--aztec-blue);
+}
+
+.question-button.is-answered {
+    background-color: var(--sky-blue);
+    border-color: var(--sky-blue);
+    color: var(--dark-navy);
+}
+
+.question-button.is-flagged {
+    background-color: var(--gold);
+    border-color: var(--dark-gold);
+    color: var(--dark-navy);
+}
+
+.question-button[aria-current="true"] {
+    outline: 3px solid var(--aztec-blue);
+    outline-offset: 2px;
+}
+
+/* Đánh dấu câu */
+#flag-question {
+    background-color: var(--gold-background);
+    border: 1px solid var(--dark-gold);
+    color: var(--dark-navy);
+}
+
+#flag-question[aria-pressed="true"] {
+    background-color: var(--gold);
+}
+
+/* Đồng hồ */
+.exam-timer {
+    background-color: var(--blue-background);
+    border-color: var(--sky-blue);
+    color: var(--dark-navy);
+}
+
+.exam-timer #time-remaining {
+    color: var(--aztec-blue);
+}
+
+.exam-timer.is-warning {
+    background-color: var(--red-background);
+    border-color: var(--lava-red);
+}
+
+.exam-timer.is-warning #time-remaining {
+    color: var(--dark-red);
+}
+
+/* Theo dõi rời trang */
+.exam-monitor {
+    background-color: var(--gold-background);
+    border-color: var(--dark-gold);
+    color: var(--dark-navy);
+}
+
+/* Xem lại bài làm */
+.review-correct {
+    border-left-color: var(--aztec-blue);
+}
+
+.review-correct .review-status {
+    color: var(--aztec-blue);
+}
+
+.review-wrong {
+    background-color: var(--red-background);
+    border-left-color: var(--lava-red);
+}
+
+.review-wrong .review-status {
+    color: var(--dark-red);
+}
+
+.review-unanswered {
+    background-color: var(--gold-background);
+    border-left-color: var(--arsenal-gold);
+}
+
+.review-unanswered .review-status {
+    color: var(--dark-navy);
+}
+
+/* Trạng thái nút bị khóa */
+button:disabled,
+input:disabled,
+select:disabled {
+    cursor: not-allowed;
+}
+
+button:disabled {
+    opacity: 0.55;
+}

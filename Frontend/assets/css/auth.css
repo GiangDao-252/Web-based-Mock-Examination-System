@@ -1,0 +1,175 @@
+/* bố cục đăng nhập / đăng ký */
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    background-color: #eff6ff;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 460px;
+    padding: 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    min-width: 0;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* logo và tiêu đề */
+
+.auth-card .logo {
+    display: block;
+    margin-bottom: 24px;
+    text-align: center;
+    white-space: normal;
+    max-width: 100%;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.auth-card h1 {
+    margin: 0 0 12px;
+    text-align: center;
+    font-size: 28px;
+    line-height: 1.3;
+}
+
+.auth-description {
+    margin: 0 0 28px;
+    text-align: center;
+    color: #475569;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* các trường nhập liệu */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid #94a3b8;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #1e293b;
+    font: inherit;
+    font-size: 16px;
+}
+
+.form-group input:focus {
+    border-color: #2563eb;
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* nút gửi form */
+
+.auth-submit {
+    width: 100%;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.auth-submit:disabled {
+    background-color: #64748b;
+    border-color: #64748b;
+    cursor: not-allowed;
+}
+
+/* liên kết chuyển giữa đăng nhập và đăng ký */
+
+.auth-switch {
+    margin: 24px 0 0;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.auth-switch a {
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+/* điều chỉnh trên điện thoại */
+
+@media (max-width: 480px) {
+    .auth-page {
+        padding: 24px 16px;
+    }
+
+    .auth-card {
+        padding: 24px 20px;
+    }
+
+    .auth-card h1 {
+        font-size: 24px;
+    }
+}
+
+.auth-message {
+    margin: 0 0 16px;
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.auth-message:empty {
+    display: none;
+}
+
+/* ẩn/hiện passwword*/
+.password-toggle {
+    display: block;
+    margin-top: 8px;
+    min-height: 44px;
+    padding: 8px 0;
+    border: none;
+    background-color: transparent;
+    color: #2563eb;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.password-toggle:hover {
+    text-decoration: underline;
+}
+
+.password-toggle:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* định dạng hướng dẫn password*/
+.form-help {
+    margin: 8px 0 0;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.auth-card [hidden] {
+    display: none;
+}
