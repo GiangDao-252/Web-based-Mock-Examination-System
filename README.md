@@ -1,4 +1,4 @@
-# Web CTQ — Web-based Mock Examination System
+# MATCHDAY — Web-based Mock Examination System
 
 ![Status](https://img.shields.io/badge/Status-Frontend%20MVP-DB0007)
 ![Platform](https://img.shields.io/badge/Platform-Web--based-lightgrey)
