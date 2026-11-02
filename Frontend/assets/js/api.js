@@ -33,13 +33,36 @@
             }
         }
 
-        const response = await fetch(base + path, {
-            method: options.method || "GET",
-            headers,
-            body
-        });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-        const text = await response.text();
+        let response;
+        let text;
+
+        try {
+            response = await fetch(base + path, {
+                method: options.method || "GET",
+                headers,
+                body,
+                signal: controller.signal
+            });
+
+            text = await response.text();
+        } catch (cause) {
+            const timedOut = controller.signal.aborted;
+
+            const error = new Error(
+                timedOut
+                    ? "Máy chủ phản hồi quá lâu. Vui lòng thử lại."
+                    : "Không kết nối được máy chủ. Kiểm tra mạng hoặc thử lại sau."
+            );
+
+            error.code = timedOut ? "TIMEOUT" : "NETWORK_ERROR";
+            throw error;
+        } finally {
+            clearTimeout(timeoutId);
+        }
+
         let data = null;
 
         if (text) {
