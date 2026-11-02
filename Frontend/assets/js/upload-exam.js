@@ -82,7 +82,7 @@ if (!window.MatchdayAuth.getSession()) return;
             const list = document.createElement("ul");
             S.keys.forEach(k => { const li = document.createElement("li"); li.className = "mvp-math"; li.textContent = k.toUpperCase() + ". " + q.options[k]; list.append(li); });
             const answer = document.createElement("p"); answer.textContent = "Đáp án đúng: " + q.correctAnswer.toUpperCase(); card.append(h, list, answer);
-            if (q.explanation.trim()) { const solution = document.createElement("p"); solution.className = "mvp-solution mvp-math"; solution.textContent = "Lời giải: " + q.explanation; card.append(solution); }
+            if (typeof q.explanation === "string" && q.explanation.trim()) { const solution = document.createElement("p"); solution.className = "mvp-solution mvp-math"; solution.textContent = "Lời giải: " + q.explanation; card.append(solution); }
             preview.append(card);
         });
         previewSection.hidden = false; window.MatchdayMath.render(preview);
@@ -109,13 +109,28 @@ if (!window.MatchdayAuth.getSession()) return;
         if (touched && !confirm("Thay nội dung đang chỉnh sửa bằng nội dung file?")) return;
         const token = ++fileRequest;
         try {
-            const data = JSON.parse(await file.text());
+            let data;
+
+            if (window.MATCHDAY_API_MODE === true) {
+                data = await window.MatchdayAPI.previewExam(file);
+            } else {
+                const text = await file.text();
+                data = JSON.parse(text.replace(/^\uFEFF/, ""));
+            }
             if (token !== fileRequest) return;
             if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("File phải chứa một đối tượng đề thi.");
             const prepared = {...data, title: typeof data.title === "string" && data.title.trim() ? data.title.trim() : file.name.replace(/\.json$/i, "").slice(0, 120), durationMinutes: data.durationMinutes === undefined ? 60 : data.durationMinutes};
             S.validate(prepared); load(prepared); touched = true; renderPreview(prepared);
             status("Đã đọc file. Kiểm tra câu hỏi, đáp án và lời giải trước khi lưu.");
-        } catch (error) { status("Không đọc được đề: " + error.message); }
+        } catch (error) {
+            if (token !== fileRequest) return;
+        
+            status(
+                error.status === 401
+                    ? "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
+                    : "Không đọc được đề: " + error.message
+            );
+        }
     });
     form.addEventListener("submit", event => {
         event.preventDefault(); if (busy) return;
