@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.routers.auth import router as auth_router
 from app.routers.exam_import import router as exam_import_router
-
-from app.routers.system import router as system_router
 from app.routers.subjects import router as subjects_router
+from app.routers.system import router as system_router
 
 
 app = FastAPI(
@@ -27,3 +27,9 @@ app.add_middleware(
 app.include_router(system_router)
 app.include_router(exam_import_router)
 app.include_router(subjects_router)
+app.include_router(auth_router)
+
+
+@app.get("/health", tags=["System"])
+def health():
+    return {"status": "ok"}

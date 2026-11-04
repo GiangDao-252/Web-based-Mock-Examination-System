@@ -32,8 +32,8 @@ def main():
 
     except psycopg.Error as exc:
         print("Không kết nối hoặc truy vấn được PostgreSQL.")
-        print("Loại lỗi:", type(error).__name__)
-        print("SQLSTATE:", error.sqlstate or "Không có")
+        print("Loại lỗi:", type(exc).__name__)
+        print("SQLSTATE:", exc.sqlstate or "Không có")
         print("Chi tiết:", str(exc))
         raise SystemExit(1)
     
