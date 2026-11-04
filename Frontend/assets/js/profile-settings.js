@@ -1,29 +1,108 @@
-window.MatchdayAuth.ready.then(function () {
-if (!window.MatchdayAuth.getSession()) return;
 (function () {
     "use strict";
+
     const form = document.querySelector("#profile-settings-form");
     if (!form) return;
-    const session = window.MatchdayAuth.getSession(); if (!session) return;
-    const name = document.querySelector("#profile-display-name");
-    const goal = document.querySelector("#profile-goal");
-    const message = document.querySelector("#profile-settings-message");
-    const key = "mock-exam-profile:" + session.accountId;
-    name.value = session.displayName || "";
-    try {
-        const saved = JSON.parse(localStorage.getItem(key) || "null");
-        if (saved && typeof saved.displayName === "string") name.value = saved.displayName;
-        if (saved && typeof saved.goal === "string") goal.value = saved.goal;
-    } catch (_) { message.textContent = "Không đọc được hồ sơ đã lưu; bạn có thể nhập và lưu lại."; }
-    form.addEventListener("submit", event => {
-        event.preventDefault();
-        name.setCustomValidity(name.value.trim() ? "" : "Hãy nhập tên hiển thị.");
-        if (!form.reportValidity()) return;
+
+    const nameInput = form.querySelector("#profile-display-name");
+    const goalInput = form.querySelector("#profile-goal");
+    const message = form.querySelector("#profile-settings-message");
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    let loaded = false;
+    let saving = false;
+
+    function setBusy(busy) {
+        nameInput.disabled = busy;
+        goalInput.disabled = busy;
+        submitButton.disabled = busy;
+    }
+
+    function showProfile(profile) {
+        nameInput.value = profile.display_name;
+        goalInput.value = profile.goal || "";
+
+        const session = window.MatchdayAuth.getSession();
+        if (session) {
+            session.display_name = profile.display_name;
+            session.displayName = profile.display_name;
+
+            document.querySelectorAll(".md-nav").forEach(nav => {
+                const label = nav.nextElementSibling;
+                if (
+                    label &&
+                    label.tagName === "SPAN" &&
+                    label.textContent.startsWith("Đang đăng nhập:")
+                ) {
+                    label.textContent =
+                        "Đang đăng nhập: " + profile.display_name;
+                }
+            });
+        }
+    }
+
+    async function loadProfile() {
+        setBusy(true);
+        message.textContent = "Đang tải hồ sơ…";
+
         try {
-            localStorage.setItem(key, JSON.stringify({displayName: name.value.trim(), goal: goal.value.trim(), updatedAt: new Date().toISOString()}));
-            message.textContent = "Đã lưu thông tin cá nhân trong trình duyệt này.";
-        } catch (_) { message.textContent = "Chưa lưu được hồ sơ. Vui lòng thử lại."; }
+            await window.MatchdayAuth.ready;
+            if (!window.MatchdayAuth.getSession()) return;
+
+            const profile = await window.MatchdayAPI.request("/profile");
+            showProfile(profile);
+            loaded = true;
+            message.textContent = "";
+        } catch (error) {
+            message.textContent =
+                error.message + " Hãy tải lại trang để thử lại.";
+        } finally {
+            setBusy(!loaded);
+        }
+    }
+
+    form.addEventListener("submit", async event => {
+        event.preventDefault();
+        if (!loaded || saving) return;
+
+        nameInput.setCustomValidity(
+            nameInput.value.trim() ? "" : "Hãy nhập tên hiển thị."
+        );
+        if (!form.reportValidity()) return;
+
+        const body = {
+            display_name: nameInput.value.trim(),
+            goal: goalInput.value.trim() || null
+        };
+
+        saving = true;
+        setBusy(true);
+        message.textContent = "Đang lưu…";
+
+        try {
+            const profile = await window.MatchdayAPI.request("/profile", {
+                method: "PATCH",
+                body
+            });
+
+            showProfile(profile);
+            message.textContent = "Đã lưu thông tin cá nhân.";
+        } catch (error) {
+            message.textContent = error.message;
+        } finally {
+            saving = false;
+            setBusy(false);
+        }
     });
-    name.addEventListener("input", () => name.setCustomValidity(""));
+
+    nameInput.addEventListener("input", () => {
+        nameInput.setCustomValidity("");
+        message.textContent = "";
+    });
+
+    goalInput.addEventListener("input", () => {
+        message.textContent = "";
+    });
+
+    loadProfile();
 })();
-}).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });

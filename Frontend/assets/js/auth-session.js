@@ -1,6 +1,9 @@
 (function () {
     "use strict";
-    const root = new URL("../../", document.currentScript.src);
+    const root = new URL(
+        "../../",
+        document.currentScript.src.split("?")[0]
+    );
     let apiUser = null;
     const apiMode = window.MATCHDAY_API_MODE === true;
     const sessionKey = "mock-exam-session";

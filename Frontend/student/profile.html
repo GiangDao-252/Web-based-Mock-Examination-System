@@ -16,9 +16,9 @@
 <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <script src="../assets/js/matchday.js" defer></script>
-    <script src="../assets/js/history.js" defer></script>
-<script src="../assets/js/comparison.js" defer></script>
-<script src="../assets/js/profile-settings.js" defer></script>
+    <script src="../assets/js/history.js?v=2" defer></script>
+    <script src="../assets/js/comparison.js?v=2" defer></script>
+    <script src="../assets/js/profile-settings.js" defer></script>
     <link rel="stylesheet" href="../assets/css/matchday-global.css">
 </head>
 <body class="matchday-page matchday-page md-profile-page">
@@ -85,14 +85,22 @@
 </section>
 <section class="mvp-panel" aria-labelledby="profile-settings-title">
 <h2 id="profile-settings-title">Thông tin cá nhân</h2>
-<p class="mvp-hint">Tài khoản demo. Thông tin này chỉ được lưu trong trình duyệt; email và mật khẩu thật sẽ được quản lý khi có backend.</p>
+<p class="mvp-hint">
+    Cập nhật tên hiển thị và mục tiêu học tập của tài khoản.
+</p>
 <form id="profile-settings-form"><div class="mvp-grid">
-<div class="mvp-field"><label for="profile-display-name">Tên hiển thị</label><input id="profile-display-name" type="text" maxlength="80" autocomplete="nickname" required></div>
+<div class="mvp-field"><label for="profile-display-name">Tên hiển thị</label><input id="profile-display-name" type="text" maxlength="100" autocomplete="nickname" required></div>
 <div class="mvp-field"><label for="profile-goal">Mục tiêu học tập (không bắt buộc)</label><input id="profile-goal" type="text" maxlength="200"></div></div>
 <button class="primary-button" type="submit">Lưu thông tin</button><p id="profile-settings-message" role="status"></p></form>
 </section>
-        <aside class="md-storage" aria-label="Thông tin lưu bài"><span aria-hidden="true">ⓘ</span><p><strong>Tiếp tục phong độ của bạn.</strong> Bài đang làm được khôi phục trong cùng tab. Toàn bộ lịch sử được lưu trong trình duyệt này; xóa dữ liệu trang web sẽ xóa lịch sử.</p></aside>
-        
+        <<aside class="md-storage" aria-label="Thông tin lưu bài">
+            <span aria-hidden="true">ⓘ</span>
+            <p>
+                <strong>Kết quả gắn với tài khoản của bạn.</strong>
+                Lịch sử và điểm số được lưu trên máy chủ.
+                Đăng nhập để xem lại các lượt đã nộp.
+            </p>
+        </aside>
     </main>
     <footer class="md-footer"><div class="container"><strong>MATCHDAY<span>★</span></strong><p>Mỗi ngày luyện tập. Một bước tiến xa hơn.</p><span>FOOTBALL INSPIRED · BUILT FOR LEARNING</span></div></footer>
 </body>

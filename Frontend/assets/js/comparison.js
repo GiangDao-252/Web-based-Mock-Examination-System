@@ -1,51 +1,102 @@
-window.MatchdayAuth.ready.then(function () {
-if (!window.MatchdayAuth.getSession()) return;
 (function () {
     "use strict";
+
     const select = document.querySelector("#comparison-group");
     const body = document.querySelector("#comparison-body");
     const message = document.querySelector("#comparison-message");
+
     if (!select || !body || !message) return;
-    function date(value) { return new Date(value).toLocaleString("vi-VN"); }
-    try {
-        const raw = JSON.parse(localStorage.getItem("mock-exam-history") || "[]");
-        if (!Array.isArray(raw)) throw new Error("Lịch sử không hợp lệ.");
-        const valid = raw.filter(window.ExamStore.validResult).sort((a, b) => Date.parse(a.submittedAt) - Date.parse(b.submittedAt));
-        const groups = new Map(); let legacy = 0;
-        valid.forEach(result => {
-            const key = window.ExamStore.comparisonKey(result);
-            if (!key) { legacy++; return; }
+
+    select.disabled = true;
+    message.textContent = "Đang tải dữ liệu so sánh…";
+
+    window.MatchdayHistoryReady.then(history => {
+        const groups = new Map();
+
+        history.forEach(result => {
+            const key = result.examVersionId;
             if (!groups.has(key)) groups.set(key, []);
             groups.get(key).push(result);
         });
+
+        const values = Array.from(groups.values());
         select.replaceChildren();
-        const values = Array.from(groups.values()).sort((a, b) => Date.parse(b[b.length - 1].submittedAt) - Date.parse(a[a.length - 1].submittedAt));
-        values.forEach((results, i) => {
-            const r = results[0]; const option = document.createElement("option"); option.value = String(i);
-            option.textContent = r.examTitle + " — v" + r.examVersion + " — " + results.length + " lượt — đầu tiên " + date(r.submittedAt);
+
+        values.forEach((results, index) => {
+            results.sort(
+                (a, b) =>
+                    Date.parse(a.submittedAt) - Date.parse(b.submittedAt)
+            );
+
+            const first = results[0];
+            const option = document.createElement("option");
+
+            option.value = String(index);
+            option.textContent =
+                `${first.examTitle} — v${first.examVersion} — ` +
+                `${results.length} lượt`;
+
             select.append(option);
         });
+
         function render() {
             body.replaceChildren();
+
             const results = values[Number(select.value)];
-            const hint = legacy ? " Có " + legacy + " lượt cũ thiếu mã đề/phiên bản nên chỉ được xem trong lịch sử, không ghép để so sánh." : "";
-            if (!results) { select.disabled = true; message.textContent = "Chưa có lượt làm có đủ thông tin phiên bản. Hoàn thành một lượt mới để bắt đầu." + hint; return; }
-            const first = results[0], last = results[results.length - 1];
-            message.textContent = results.length > 1 ? "Cùng đề, cùng phiên bản, nội dung và thời lượng. Điểm lượt mới nhất so với lượt đầu: " + (last.score - first.score >= 0 ? "+" : "") + (last.score - first.score).toFixed(2) + "." + hint : "Mới có một lượt cho phiên bản này. Làm lại đúng đề để có số liệu so sánh." + hint;
-            [...results].reverse().forEach((r, index) => {
+
+            if (!results) {
+                select.disabled = true;
+                message.textContent = "Chưa có kết quả để so sánh.";
+                return;
+            }
+
+            select.disabled = false;
+
+            const first = results[0];
+            const last = results[results.length - 1];
+            const change = last.score - first.score;
+
+            message.textContent = results.length > 1
+                ? "Cùng đề và cùng phiên bản. " +
+                  "Điểm lượt mới nhất so với lượt đầu: " +
+                  (change >= 0 ? "+" : "") + change.toFixed(2) +
+                  ". Điều kiện thực tế của các lượt có thể khác nhau."
+                : "Mới có một lượt cho phiên bản này.";
+
+            [...results].reverse().forEach((result, index) => {
                 const row = document.createElement("tr");
-                const cells = [String(results.length - index), date(r.submittedAt), r.score.toFixed(2) + " / 10", r.correctQuestions + "/" + r.totalQuestions, r.pageLeaveCount, r.reason === "timeout" ? "Hết giờ" : "Đã nộp"];
-                cells.forEach(value => { const td = document.createElement("td"); td.textContent = value; row.append(td); });
-                const td = document.createElement("td"), button = document.createElement("button"); button.type = "button"; button.className = "secondary-button"; button.textContent = "Xem bài";
-                button.setAttribute("aria-label", "Xem lượt làm ngày " + date(r.submittedAt));
-                button.addEventListener("click", () => {
-                    try { sessionStorage.setItem("mock-exam-result", JSON.stringify(r)); location.href = "report.html"; }
-                    catch (_) { message.textContent = "Không mở được kết quả. Hãy kiểm tra dung lượng lưu trữ trình duyệt."; }
+
+                [
+                    results.length - index,
+                    new Date(result.submittedAt).toLocaleString("vi-VN"),
+                    result.score.toFixed(2) + " / 10",
+                    `${result.correctQuestions}/${result.totalQuestions}`,
+                    result.pageLeaveCount,
+                    result.status === "timed_out" ? "Hết giờ" : "Đã nộp"
+                ].forEach(value => {
+                    const cell = document.createElement("td");
+                    cell.textContent = String(value);
+                    row.append(cell);
                 });
-                td.append(button); row.append(td); body.append(row);
+
+                const cell = document.createElement("td");
+                const link = document.createElement("a");
+
+                link.className = "secondary-button";
+                link.textContent = "Xem bài";
+                link.href = "report.html?attemptId=" +
+                    encodeURIComponent(result.attemptId);
+
+                cell.append(link);
+                row.append(cell);
+                body.append(row);
             });
         }
-        select.addEventListener("change", render); render();
-    } catch (error) { select.disabled = true; message.textContent = "Không đọc được dữ liệu so sánh: " + error.message; }
+
+        select.addEventListener("change", render);
+        render();
+    }).catch(error => {
+        body.replaceChildren();
+        message.textContent = error.message;
+    });
 })();
-}).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });

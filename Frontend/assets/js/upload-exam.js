@@ -1,6 +1,6 @@
-window.MatchdayAuth.ready.then(function () {
+window.MatchdayAuth.ready.then(async function () {
 if (!window.MatchdayAuth.getSession()) return;
-(function () {
+await (async function () {
     "use strict";
     const S = window.ExamStore;
     const form = document.querySelector("#exam-editor-form");
@@ -132,29 +132,121 @@ if (!window.MatchdayAuth.getSession()) return;
             );
         }
     });
-    form.addEventListener("submit", event => {
-        event.preventDefault(); if (busy) return;
-        const exam = checkedExam(); if (!exam) return;
-        busy = true; saveButton.disabled = true;
+    form.addEventListener("submit", async event => {
+        event.preventDefault();
+        if (busy) return;
+
+        const exam = checkedExam();
+        if (!exam) return;
+
+        const payload = {
+            title: exam.title,
+            durationMinutes: exam.durationMinutes,
+            questions: exam.questions.map(question => ({
+                text: question.text,
+                options: question.options,
+                correctAnswer: question.correctAnswer,
+                ...(question.explanation
+                    ? { explanation: question.explanation }
+                    : {})
+            }))
+        };
+
+        const path = original
+            ? "/exams/" + encodeURIComponent(original.examId)
+            : "/exams";
+
+        if (original) {
+            payload.expectedVersion = original.examVersion;
+        }
+
+        busy = true;
+        saveButton.disabled = true;
+        status("Đang lưu đề…");
+
         try {
-            const saved = S.save(exam, original); original = JSON.parse(JSON.stringify(saved)); touched = false;
-            history.replaceState(null, "", "upload-exam.html?edit=" + encodeURIComponent(saved.id));
-            document.querySelector("#editor-title").textContent = "Chỉnh sửa đề đã lưu";
-            status("Đã lưu “" + saved.title + "” — phiên bản " + saved.examVersion + ". Lịch sử bài làm cũ được giữ nguyên.");
-            renderPreview(saved);
-            const link = document.querySelector("#saved-exam-link"); link.href = "exam.html?id=" + encodeURIComponent(saved.id); link.hidden = false;
-        } catch (error) { status("Chưa lưu được đề: " + error.message); }
-        finally { busy = false; saveButton.disabled = false; }
+            const saved = await window.MatchdayAPI.request(path, {
+                method: original ? "PUT" : "POST",
+                body: payload
+            });
+
+            original = {
+                ...saved,
+                questions: payload.questions
+            };
+            touched = false;
+
+            history.replaceState(
+                null,
+                "",
+                "upload-exam.html?edit=" +
+                    encodeURIComponent(saved.examId)
+            );
+
+            document.querySelector("#editor-title").textContent =
+                "Chỉnh sửa đề đã lưu";
+
+            status(
+                `Đã lưu “${saved.title}” — phiên bản ` +
+                `${saved.examVersion}.`
+            );
+
+            const link = document.querySelector("#saved-exam-link");
+            link.href = "exam.html?examVersionId=" +
+                encodeURIComponent(saved.examVersionId);
+            link.hidden = false;
+        } catch (error) {
+            status(
+                error.status === 409
+                    ? "Đề đã thay đổi. Hãy sao chép nội dung đang sửa " +
+                      "trước khi tải lại trang."
+                    : "Chưa lưu được đề: " + error.message
+            );
+        } finally {
+            busy = false;
+            saveButton.disabled = false;
+        }
     });
     window.addEventListener("beforeunload", event => { if (touched) { event.preventDefault(); event.returnValue = ""; } });
     try {
         if (editId) {
-            original = S.readExams().find(e => e && e.id === editId);
-            if (!original) throw new Error("Không tìm thấy đề cá nhân để chỉnh sửa.");
-            S.validate(original); load(original);
-            document.querySelector("#editor-title").textContent = "Chỉnh sửa đề đã lưu";
-            status("Đang sửa phiên bản " + S.revision(original) + ". Lưu nội dung thay đổi sẽ tạo phiên bản tiếp theo.");
-        } else load({title: "", durationMinutes: 60, questions: [blankQuestion()]});
-    } catch (error) { status(error.message); form.hidden = true; }
+            original = await window.MatchdayAPI.request(
+                "/exams/" + encodeURIComponent(editId)
+            );
+
+            const prepared = {
+                title: original.title,
+                durationMinutes: original.durationMinutes,
+                questions: original.questions.map(question => ({
+                    text: question.text,
+                    options: question.options,
+                    correctAnswer: question.correctAnswer,
+                    ...(question.explanation !== null
+                        ? { explanation: question.explanation }
+                        : {})
+                }))
+            };
+
+            S.validate(prepared);
+            load(prepared);
+
+            document.querySelector("#editor-title").textContent =
+                "Chỉnh sửa đề đã lưu";
+
+            status(
+                `Đang sửa phiên bản ${original.examVersion}. ` +
+                "Lưu đề sẽ tạo phiên bản mới."
+            );
+        } else {
+            load({
+                title: "",
+                durationMinutes: 60,
+                questions: [blankQuestion()]
+            });
+        }
+    } catch (error) {
+        status(error.message);
+        form.hidden = true;
+    }
 })();
 }).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });

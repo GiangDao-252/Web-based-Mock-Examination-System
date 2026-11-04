@@ -1,821 +1,884 @@
-window.MatchdayAuth.ready.then(function () {
-if (!window.MatchdayAuth.getSession()) return;
-const examForm = document.querySelector("#exam-form");
+(function () {
+    "use strict";
 
-if (examForm && examForm.dataset.loadError !== "true") {
-    prepareExam();
-}
+    const $ = selector => document.querySelector(selector);
+    const form = $("#exam-form");
+    if (!form) return;
 
-function examIdentity(exam) {
-    return JSON.stringify([exam.id, window.ExamStore.revision(exam), window.ExamStore.fingerprint(exam)]);
-}
-function prepareExam() {
-    const exam = examForm.examData;
-    const gate = document.querySelector("#exam-preflight");
-    const layout = document.querySelector(".exam-layout");
-    const monitorPanel = document.querySelector(".exam-monitor");
-    const timer = document.querySelector(".exam-header");
-    const startButton = document.querySelector("#start-exam");
-    if (!exam || !gate || !startButton) return;
-    timer.hidden = true; layout.hidden = true; monitorPanel.hidden = true;
-    document.querySelector("#preflight-summary").textContent = exam.title + " • Phiên bản " + window.ExamStore.revision(exam) + " • " + exam.questions.length + " câu • " + exam.durationMinutes + " phút.";
-    let draft = null;
-    try { draft = JSON.parse(sessionStorage.getItem("mock-exam-draft")); } catch (_) { /* The gate stays usable. */ }
-    function start() {
-        gate.hidden = true; timer.hidden = false; layout.hidden = false; monitorPanel.hidden = false;
-        initializeExam();
-        window.MatchdayMath.render(examForm);
+    const api = window.MatchdayAPI;
+    const auth = window.MatchdayAuth;
+    const params = new URLSearchParams(location.search);
+
+    const gate = $("#exam-preflight");
+    const startButton = $("#start-exam");
+    const layout = $(".exam-layout");
+    const timerHeader = $(".exam-header");
+    const monitor = $(".exam-monitor");
+    const saveMessage = $("#exam-save-message");
+    const submitMessage = $("#exam-submit-message");
+    const submitButton = $("#submit-exam");
+
+    let attempt = null;
+    let answers = [];
+    let current = 1;
+    let revision = 0;
+    let savedRevision = 0;
+    let events = [];
+    let leaveCount = 0;
+    let ending = false;
+    let finished = false;
+    let blocked = false;
+    let sending = false;
+    let storageOK = true;
+    let interval = null;
+    let journalKey = "";
+    let lastSent = null;
+
+    function text(selector, value) {
+        const element = $(selector);
+        if (element) element.textContent = String(value);
     }
-    if (draft && draft.examSignature === examIdentity(exam)) {
-        // Resume immediately: the original deadline continues, including elapsed time away.
-        start(); return;
+
+    function hide(element, value) {
+        if (element) element.hidden = value;
     }
-    gate.hidden = false;
-    if (draft) document.querySelector("#preflight-message").textContent = "Có tiến độ của đề hoặc phiên bản khác trong tab này. Bắt đầu lượt mới sẽ thay tiến độ đó.";
-    startButton.addEventListener("click", function () {
-        if (draft && !confirm("Bắt đầu lượt mới và thay tiến độ đang lưu trong tab này?")) return;
-        startButton.disabled = true; start();
-    }, {once: false});
-}
 
-function initializeExam() {
-    // 1. Tìm các phần tử giao diện.
-    const questionCards = Array.from(
-        examForm.querySelectorAll(".question-card")
-    );
+    function setExamInfo(exam, count) {
+        document.title = exam.title + " | MATCHDAY";
+        text("h1", exam.title);
 
-    const questionButtons = Array.from(
-        document.querySelectorAll(".question-button")
-    );
+        // Không dùng ".exam-note" chung vì thông báo nộp bài
+        // cũng có thể sử dụng class này.
+        const heading = $("h1");
+        const container = heading && heading.parentElement;
+        const note = container && container.querySelector(".exam-note");
 
-    const flagButton = document.querySelector("#flag-question");
-    const currentQuestionText = document.querySelector("#current-question");
-    const answeredCountText = document.querySelector("#answered-count");
-    const previousButton = document.querySelector("#previous-question");
-    const nextButton = document.querySelector("#next-question");
-
-    const timeRemaining = document.querySelector("#time-remaining");
-    const timerMessage = document.querySelector("#timer-message");
-    const timerContainer = document.querySelector(".exam-timer");
-
-    const submitButton = examForm.querySelector("#submit-exam");
-    const submitMessage = examForm.querySelector("#exam-submit-message");
-    const viewReportLink = document.querySelector("#view-report");
-    const saveMessage = document.querySelector("#exam-save-message");
-
-    // 2. Kiểm tra giao diện.
-    const requiredElements = [
-        flagButton,
-        currentQuestionText,
-        answeredCountText,
-        previousButton,
-        nextButton,
-        timeRemaining,
-        timerMessage,
-        timerContainer,
-        submitButton,
-        submitMessage,
-        viewReportLink
-    ];
-
-    if (requiredElements.some(function (element) {
-        return element === null;
-    })) {
-        console.error("Trang thi thiếu phần tử HTML cần thiết.");
-
-        if (submitMessage) {
-            submitMessage.textContent =
-                "Không khởi động được bài thi. Giao diện thiếu thành phần.";
+        if (note && note !== submitMessage && note !== saveMessage) {
+            note.textContent =
+                `${count} câu · ${exam.durationMinutes} phút · ` +
+                `Phiên bản ${exam.examVersion}`;
         }
+
+        text(
+            "#preflight-summary",
+            `${exam.title} · ${count} câu · ` +
+            `${exam.durationMinutes} phút · v${exam.examVersion}`
+        );
+    }
+
+    hide(layout, true);
+    hide(timerHeader, true);
+    hide(monitor, true);
+    hide(gate, true);
+    hide($("#view-report"), true);
+    if (startButton) startButton.disabled = true;
+    if (submitButton) submitButton.disabled = true;
+
+    function deadline() {
+        return attempt ? Date.parse(attempt.deadlineAt) : 0;
+    }
+
+    function editable() {
+        return Boolean(attempt) &&
+            !finished && !ending && !blocked &&
+            Date.now() < deadline();
+    }
+
+    function snapshot() {
+        return answers.map(answer => ({ ...answer }));
+    }
+
+    function normalizeAnswers(state) {
+        const saved = new Map(
+            (state.answers || []).map(answer => [
+                answer.questionId,
+                answer
+            ])
+        );
+
+        return state.exam.questions.map(question => ({
+            questionId: question.id,
+            selectedAnswer:
+                saved.get(question.id)?.selectedAnswer ?? null,
+            isFlagged: saved.get(question.id)?.isFlagged ?? false
+        }));
+    }
+
+    function sameAnswers(left, right) {
+        function normalize(values) {
+            return values.map(value => ({
+                questionId: value.questionId,
+                selectedAnswer: value.selectedAnswer ?? null,
+                isFlagged: value.isFlagged === true
+            })).sort((a, b) =>
+                a.questionId.localeCompare(b.questionId)
+            );
+        }
+
+        return JSON.stringify(normalize(left)) ===
+            JSON.stringify(normalize(right));
+    }
+
+    function persist() {
+        if (!attempt || !journalKey || finished) return;
+
+        try {
+            sessionStorage.setItem(journalKey, JSON.stringify({
+                syncVersion: attempt.syncVersion,
+                answers,
+                current,
+                events,
+                leaveCount,
+                dirty: revision !== savedRevision,
+                ending,
+                lastSent
+            }));
+        } catch {
+            storageOK = false;
+            text(
+                "#exam-save-message",
+                "Không lưu được bản nháp trong tab. " +
+                "Giữ trang mở để đồng bộ với máy chủ."
+            );
+        }
+    }
+
+    function showConflict(message) {
+        blocked = true;
+        clearInterval(interval);
+
+        text(
+            "#exam-save-message",
+            message ||
+            "Lượt làm đã thay đổi ở nơi khác. Bản nháp trong tab " +
+            "được giữ lại và chưa ghi đè dữ liệu máy chủ."
+        );
+
+        renderNavigation();
+
+        if ($("#reload-attempt")) return;
+
+        const button = document.createElement("button");
+        button.id = "reload-attempt";
+        button.type = "button";
+        button.className = "secondary-button";
+        button.textContent = "Tải trạng thái máy chủ";
+
+        button.addEventListener("click", function () {
+            if (!confirm(
+                "Bỏ bản nháp chưa đồng bộ trong tab này " +
+                "và tải dữ liệu đang lưu trên máy chủ?"
+            )) return;
+
+            try {
+                sessionStorage.removeItem(journalKey);
+            } catch {
+                text(
+                    "#exam-save-message",
+                    "Không xóa được bản nháp. Kiểm tra quyền lưu trữ."
+                );
+                return;
+            }
+
+            location.reload();
+        });
+
+        (saveMessage || submitMessage || form).after(button);
+    }
+
+    function renderNavigation() {
+        if (!attempt || !answers.length) return;
+
+        form.querySelectorAll(".question-card").forEach((card, index) => {
+            card.hidden = index + 1 !== current;
+        });
+
+        document.querySelectorAll(".question-button")
+            .forEach((button, index) => {
+                const answer = answers[index];
+                if (!answer) return;
+
+                const active = index + 1 === current;
+                const answered = answer.selectedAnswer !== null;
+
+                button.classList.toggle("active", active);
+                button.classList.toggle("is-current", active);
+                button.classList.toggle("answered", answered);
+                button.classList.toggle("is-answered", answered);
+                button.classList.toggle("flagged", answer.isFlagged);
+                button.classList.toggle("is-flagged", answer.isFlagged);
+                button.textContent =
+                    String(index + 1) + (answer.isFlagged ? " ⚑" : "");
+                button.setAttribute("aria-current", String(active));
+            });
+
+        text("#current-question", `Câu ${current} / ${answers.length}`);
+        text(
+            "#answered-count",
+            `Đã trả lời ${
+                answers.filter(answer => answer.selectedAnswer !== null)
+                    .length
+            } / ${answers.length}`
+        );
+
+        const flag = $("#flag-question");
+        if (flag) {
+            const flagged = answers[current - 1].isFlagged;
+            flag.textContent = flagged
+                ? "⚑ Bỏ đánh dấu"
+                : "⚑ Đánh dấu xem lại";
+            flag.setAttribute("aria-pressed", String(flagged));
+            flag.disabled = !editable();
+        }
+
+        const previous = $("#previous-question");
+        const next = $("#next-question");
+
+        if (previous) previous.disabled = current === 1;
+        if (next) next.disabled = current === answers.length;
+
+        form.querySelectorAll('input[type="radio"]').forEach(input => {
+            const answer = answers[Number(input.dataset.index)];
+            input.checked = answer.selectedAnswer === input.value;
+            input.disabled = !editable();
+        });
 
         if (submitButton) {
-            submitButton.disabled = true;
+            submitButton.disabled = finished || blocked || sending;
+            submitButton.textContent = ending
+                ? "Thử nộp lại"
+                : "Nộp bài";
         }
 
-        return;
+        text("#page-leave-count", leaveCount);
     }
 
-    function showSetupError(message) {
-        submitMessage.textContent = message;
-        submitButton.disabled = true;
-        viewReportLink.hidden = true;
+    function move(number) {
+        if (!attempt || !answers.length) return;
+
+        const target = Math.max(1, Math.min(answers.length, number));
+        if (target === current) return;
+
+        current = target;
+        if (editable()) revision++;
+
+        persist();
+        renderNavigation();
     }
 
-    if (questionCards.length === 0) {
-        showSetupError("Đề thi chưa có câu hỏi.");
-        return;
-    }
+    function buildQuestions() {
+        const grid = $(".question-grid");
+        const actions = form.querySelector(".question-actions");
 
-    const navigationIsValid =
-        questionButtons.length === questionCards.length &&
-        questionCards.every(function (card, index) {
-            const legend = card.querySelector("legend");
+        if (!grid || !actions) {
+            throw new Error("Trang thi thiếu vùng câu hỏi hoặc điều hướng.");
+        }
 
-            return (
-                card.dataset.question === String(index + 1) &&
-                questionButtons[index].dataset.question ===
-                    card.dataset.question &&
-                legend !== null &&
-                legend.textContent.trim().length > 0
-            );
-        });
+        grid.replaceChildren();
+        form.querySelectorAll(".question-card").forEach(card => card.remove());
 
-    if (!navigationIsValid) {
-        showSetupError(
-            "Kiểm tra tiêu đề câu hỏi, số thứ tự và bảng điều hướng."
-        );
-        return;
-    }
+        attempt.exam.questions.forEach((question, index) => {
+            const nav = document.createElement("button");
+            nav.type = "button";
+            nav.className = "question-button";
+            nav.dataset.question = String(index + 1);
+            nav.addEventListener("click", () => move(index + 1));
+            grid.append(nav);
 
-    // 3. Đọc dữ liệu đề.
-    const examData = examForm.examData;
-    const hasExamData = examData !== undefined && examData !== null;
-
-    if (
-        hasExamData &&
-        (
-            typeof examData !== "object" ||
-            Array.isArray(examData) ||
-            !Array.isArray(examData.questions) ||
-            typeof examData.title !== "string" ||
-            examData.title.trim().length === 0
-        )
-    ) {
-        showSetupError("Dữ liệu đề thi không hợp lệ.");
-        return;
-    }
-
-    const examTitle = hasExamData
-        ? examData.title.trim()
-        : "Thi thử Toán học";
-
-    // Đáp án dự phòng chỉ dành cho đề mẫu ba câu có sẵn.
-    const correctAnswers = hasExamData
-        ? examData.questions.map(function (question) {
-            return question ? question.correctAnswer : null;
-        })
-        : ["b", "c", "c"];
-
-    const answerKeys = ["a", "b", "c", "d"];
-
-    const radioGroups = questionCards.map(function (card) {
-        return Array.from(
-            card.querySelectorAll('input[type="radio"]')
-        );
-    });
-
-    const answersAreValid =
-        correctAnswers.length === questionCards.length &&
-        correctAnswers.every(function (answer, index) {
-            return (
-                answerKeys.includes(answer) &&
-                radioGroups[index].some(function (input) {
-                    return input.value === answer;
-                })
-            );
-        });
-
-    if (!answersAreValid) {
-        showSetupError(
-            "Đáp án đúng không khớp với các câu hỏi trong đề."
-        );
-        return;
-    }
-
-    const durationMinutes =
-        examForm.dataset.durationMinutes === undefined
-            ? 60
-            : Number(examForm.dataset.durationMinutes);
-
-    if (
-        !Number.isInteger(durationMinutes) ||
-        durationMinutes < 1 ||
-        durationMinutes > 180
-    ) {
-        showSetupError("Thời lượng đề thi không hợp lệ.");
-        return;
-    }
-
-    // 4. Thiết lập trạng thái.
-    const draftKey = "mock-exam-draft";
-    const resultKey = "mock-exam-result";
-    const durationMilliseconds = durationMinutes * 60 * 1000;
-
-    const questionNumbers = questionCards.map(function (card) {
-        return card.dataset.question;
-    });
-
-    // Keep original source text; MathJax-generated DOM must never enter a saved snapshot.
-    const questionTexts = examData.questions.map((q, i) => "Câu " + (i + 1) + ". " + q.text);
-    const examSignature = examIdentity(examData);
-
-    const monitor =
-        window.examMonitor &&
-        typeof window.examMonitor.start === "function" &&
-        typeof window.examMonitor.stop === "function" &&
-        typeof window.examMonitor.getLeaveCount === "function"
-            ? window.examMonitor
-            : null;
-
-    let startedAt = Date.now();
-    let attemptId = crypto.randomUUID();
-    let deadline = startedAt + durationMilliseconds;
-    let currentQuestion = questionNumbers[0];
-    let selectedAnswers = questionCards.map(function () {
-        return null;
-    });
-
-    let isSubmitted = false;
-    let timerInterval = null;
-    let restoredLeaveCount = 0;
-    let restoredLeaveEvents = [];
-    let monitorStarted = false;
-
-    const flaggedQuestions = new Set();
-
-    examForm.noValidate = true;
-
-    viewReportLink.hidden = true;
-    submitMessage.textContent = "";
-    timerMessage.textContent = "";
-
-    // Các nút điều hướng không được tự submit form.
-    [
-        flagButton,
-        previousButton,
-        nextButton,
-        ...questionButtons
-    ].forEach(function (button) {
-        button.type = "button";
-    });
-
-    questionCards.forEach(function (card) {
-        if (!card.hasAttribute("tabindex")) {
+            const card = document.createElement("fieldset");
+            card.className = "question-card";
+            card.dataset.question = String(index + 1);
             card.tabIndex = -1;
-        }
-    });
 
-    // 5. Đọc và hiển thị đáp án.
-    function readAnswersFromForm() {
-        return radioGroups.map(function (inputs) {
-            const selectedInput = inputs.find(function (input) {
-                return input.checked;
+            const legend = document.createElement("legend");
+            legend.className = "mvp-math";
+            legend.textContent = `Câu ${index + 1}. ${question.text}`;
+            card.append(legend);
+
+            ["a", "b", "c", "d"].forEach(key => {
+                if (question.options[key] === undefined) return;
+
+                const label = document.createElement("label");
+                label.className = "answer-option";
+
+                const input = document.createElement("input");
+                input.type = "radio";
+                input.name = "question-" + index;
+                input.value = key;
+                input.dataset.index = String(index);
+
+                input.addEventListener("change", function () {
+                    if (!editable()) {
+                        renderNavigation();
+                        return;
+                    }
+
+                    answers[index].selectedAnswer = key;
+                    revision++;
+                    persist();
+                    renderNavigation();
+                });
+
+                const content = document.createElement("span");
+                content.className = "mvp-math";
+                content.textContent =
+                    key.toUpperCase() + ". " + question.options[key];
+
+                label.append(input, content);
+                card.append(label);
             });
 
-            return selectedInput ? selectedInput.value : null;
+            form.insertBefore(card, actions);
         });
     }
 
-    function renderSelectedAnswers() {
-        radioGroups.forEach(function (inputs, index) {
-            inputs.forEach(function (input) {
-                input.checked = input.value === selectedAnswers[index];
-                input.disabled = isSubmitted;
-            });
-        });
-    }
-
-    function getPageLeaveCount() {
-        if (monitorStarted) {
-            const count = monitor.getLeaveCount();
-
-            if (Number.isSafeInteger(count) && count >= 0) {
-                return count;
-            }
-        }
-
-        return restoredLeaveCount;
-    }
-
-    function getRemainingSeconds() {
-        return Math.max(
-            0,
-            Math.ceil((deadline - Date.now()) / 1000)
+    function closeEvent() {
+        const open = events.find(event =>
+            !event.visibleAt && !event.endedAt
         );
-    }
+        if (!open || !attempt) return;
 
-    // 6. Lưu bài đang làm.
-    function saveDraft() {
-        if (isSubmitted) {
-            return;
-        }
-
-        const draft = {
-            version: 1,
-            examSignature: examSignature,
-            deadline: deadline,
-            startedAt: startedAt,
-            attemptId: attemptId,
-            selectedAnswers: selectedAnswers.slice(),
-            flaggedQuestions: Array.from(flaggedQuestions),
-            currentQuestion: currentQuestion,
-            pageLeaveCount: getPageLeaveCount(),
-            leaveEvents: monitorStarted && monitor.getEvents ? monitor.getEvents() : restoredLeaveEvents
-        };
-
-        try {
-            sessionStorage.setItem(draftKey, JSON.stringify(draft));
-
-            if (saveMessage) {
-                saveMessage.textContent =
-                    "Đã lưu tiến độ trong tab này.";
-            }
-        } catch (error) {
-            if (saveMessage) {
-                saveMessage.textContent =
-                    "Không lưu được tiến độ. Tải lại trang có thể làm mất bài đang làm.";
-            }
-
-            console.error(error);
-        }
-    }
-
-    // 7. Khôi phục bài đang làm.
-    function restoreDraft() {
-        try {
-            const savedDraft = sessionStorage.getItem(draftKey);
-
-            if (savedDraft === null) {
-                return;
-            }
-
-            const draft = JSON.parse(savedDraft);
-
-            const draftIsValid =
-                draft !== null &&
-                typeof draft === "object" &&
-                !Array.isArray(draft) &&
-                draft.version === 1 &&
-                draft.examSignature === examSignature &&
-                Number.isSafeInteger(draft.deadline) &&
-                draft.deadline > 0 &&
-                draft.deadline <= Date.now() + durationMilliseconds &&
-                Array.isArray(draft.selectedAnswers) &&
-                draft.selectedAnswers.length === questionCards.length &&
-                draft.selectedAnswers.every(function (answer, index) {
-                    return (
-                        answer === null ||
-                        radioGroups[index].some(function (input) {
-                            return input.value === answer;
-                        })
-                    );
-                }) &&
-                Array.isArray(draft.flaggedQuestions) &&
-                draft.flaggedQuestions.every(function (number) {
-                    return questionNumbers.includes(number);
-                }) &&
-                questionNumbers.includes(draft.currentQuestion) &&
-                Number.isSafeInteger(draft.pageLeaveCount) &&
-                draft.pageLeaveCount >= 0;
-
-            if (!draftIsValid) {
-                sessionStorage.removeItem(draftKey);
-                return;
-            }
-
-            deadline = draft.deadline;
-            startedAt = Number.isSafeInteger(draft.startedAt) ? draft.startedAt : deadline - durationMilliseconds;
-            attemptId = typeof draft.attemptId === "string" ? draft.attemptId : attemptId;
-            restoredLeaveEvents = Array.isArray(draft.leaveEvents) ? draft.leaveEvents : [];
-            currentQuestion = draft.currentQuestion;
-            selectedAnswers = draft.selectedAnswers.slice();
-            restoredLeaveCount = draft.pageLeaveCount;
-
-            draft.flaggedQuestions.forEach(function (number) {
-                flaggedQuestions.add(number);
-            });
-        } catch (error) {
-            if (saveMessage) {
-                saveMessage.textContent =
-                    "Không đọc được tiến độ đã lưu.";
-            }
-
-            console.error(error);
-        }
-    }
-
-    // 8. Cập nhật bảng điều hướng.
-    function updateNavigation() {
-        questionButtons.forEach(function (button, index) {
-            const number = button.dataset.question;
-            const isAnswered = selectedAnswers[index] !== null;
-            const isFlagged = flaggedQuestions.has(number);
-
-            button.classList.toggle("is-answered", isAnswered);
-            button.classList.toggle("is-flagged", isFlagged);
-
-            button.setAttribute(
-                "aria-current",
-                String(number === currentQuestion)
-            );
-
-            button.textContent = number + (isFlagged ? " ⚑" : "");
-
-            button.setAttribute(
-                "aria-label",
-                "Câu " + number +
-                (isAnswered ? ", đã trả lời" : ", chưa trả lời") +
-                (isFlagged ? ", cần xem lại" : "")
-            );
-        });
-
-        const answeredCount = selectedAnswers.filter(function (answer) {
-            return answer !== null;
-        }).length;
-
-        answeredCountText.textContent =
-            "Đã trả lời " + answeredCount +
-            " / " + questionCards.length + " câu.";
-
-        const isFlagged = flaggedQuestions.has(currentQuestion);
-
-        flagButton.setAttribute("aria-pressed", String(isFlagged));
-
-        flagButton.textContent = isFlagged
-            ? "⚑ Bỏ đánh dấu"
-            : "⚑ Đánh dấu xem lại";
-
-        flagButton.disabled = isSubmitted;
-    }
-
-    // 9. Chuyển câu.
-    function showQuestion(questionNumber, moveFocus) {
-        const currentIndex = questionNumbers.indexOf(questionNumber);
-
-        if (currentIndex === -1) {
-            return;
-        }
-
-        currentQuestion = questionNumber;
-
-        questionCards.forEach(function (card, index) {
-            card.hidden = index !== currentIndex;
-        });
-
-        currentQuestionText.textContent =
-            "Câu " + questionNumber + " / " + questionCards.length;
-
-        previousButton.disabled = currentIndex === 0;
-        nextButton.disabled = currentIndex === questionCards.length - 1;
-
-        updateNavigation();
-
-        if (moveFocus) {
-            questionCards[currentIndex].focus();
-            saveDraft();
-        }
-    }
-
-    // 10. Hiển thị đồng hồ.
-    function renderTime(remainingSeconds) {
-        const minutes = Math.floor(remainingSeconds / 60);
-        const seconds = remainingSeconds % 60;
-
-        timeRemaining.textContent =
-            String(minutes).padStart(2, "0") + ":" +
-            String(seconds).padStart(2, "0");
-
-        timerContainer.classList.toggle(
-            "is-warning",
-            remainingSeconds <= 5 * 60
-        );
-    }
-
-    // 11. Kết thúc bài, chấm điểm và lưu kết quả.
-    function finishExam(reason) {
-        if (isSubmitted) {
-            return;
-        }
-
-        // Giữ bản dự phòng nếu lưu kết quả bị lỗi.
-        saveDraft();
-
-        const pageLeaveCount = getPageLeaveCount();
-
-        isSubmitted = true;
-        clearInterval(timerInterval);
-
-        if (monitorStarted) {
-            monitor.stop(reason === "timeout" ? deadline : Date.now());
-        }
-
-        renderSelectedAnswers();
-
-        renderTime(reason === "timeout" ? 0 : getRemainingSeconds());
-
-        const answeredCount = selectedAnswers.filter(function (answer) {
-            return answer !== null;
-        }).length;
-
-        const correctCount = selectedAnswers.filter(
-            function (answer, index) {
-                return answer === correctAnswers[index];
-            }
-        ).length;
-
-        const wrongCount = answeredCount - correctCount;
-
-        const score = Number(
-            (correctCount / questionCards.length * 10).toFixed(2)
+        const at = Math.max(
+            Date.parse(open.hiddenAt),
+            Math.min(Date.now(), deadline())
         );
 
-        submitButton.disabled = true;
-        submitButton.textContent = "Đã kết thúc";
-
-        timerMessage.textContent = reason === "timeout"
-            ? "Đã hết thời gian. Bạn chỉ có thể xem lại bài."
-            : "Bạn đã nộp bài. Đồng hồ đã dừng.";
-
-        submitMessage.textContent =
-            "Đã trả lời " + answeredCount +
-            " / " + questionCards.length +
-            " câu. Điểm: " + score.toFixed(2) +
-            " / 10. Đúng " + correctCount +
-            " câu, sai " + wrongCount +
-            " câu, bỏ trống " +
-            (questionCards.length - answeredCount) +
-            " câu. Kết quả chưa được gửi lên máy chủ.";
-
-        const result = {
-            version: 1,
-            attemptId: attemptId,
-            startedAt: new Date(startedAt).toISOString(),
-            endedAt: new Date(reason === "timeout" ? deadline : Date.now()).toISOString(),
-            durationMinutes: durationMinutes,
-            examId: examData.id,
-            examVersion: window.ExamStore.revision(examData),
-            examFingerprint: window.ExamStore.fingerprint(examData),
-            submittedAt: new Date().toISOString(),
-            examTitle: examTitle,
-            totalQuestions: questionCards.length,
-            answeredQuestions: answeredCount,
-            correctQuestions: correctCount,
-            wrongQuestions: wrongCount,
-            score: score,
-
-            questions: questionCards.map(function (card, index) {
-                return {
-                    questionNumber: index + 1,
-                    questionText: questionTexts[index],
-                    selectedAnswer: selectedAnswers[index],
-                    correctAnswer: correctAnswers[index],
-                    options: {...examData.questions[index].options},
-                    explanation: examData.questions[index].explanation || ""
-                };
-            }),
-
-            reason: reason,
-            pageLeaveCount: pageLeaveCount,
-            leaveEvents: monitorStarted && monitor.getEvents ? monitor.getEvents() : restoredLeaveEvents
-        };
-
-        let resultSaved = false;
-
-        try {
-            sessionStorage.setItem(resultKey, JSON.stringify(result));
-
-            resultSaved = true;
-            viewReportLink.hidden = false;
-
-            // Lưu lịch sử riêng; lỗi lịch sử không làm mất kết quả hiện tại.
-            try {
-                const historyKey = "mock-exam-history";
-                const savedHistory = localStorage.getItem(historyKey);
-
-                const history = savedHistory === null
-                    ? []
-                    : JSON.parse(savedHistory);
-
-                if (!Array.isArray(history)) {
-                    throw new Error("Dữ liệu lịch sử không hợp lệ.");
-                }
-
-                const updatedHistory = [
-                    result,
-                    ...history.filter(function (item) {
-                        return (
-                            item !== null &&
-                            typeof item === "object" &&
-                            item.attemptId !== result.attemptId
-                        );
-                    })
-                ];
-
-                localStorage.setItem(
-                    historyKey,
-                    JSON.stringify(updatedHistory)
-                );
-            } catch (error) {
-                submitMessage.textContent +=
-                    " Không lưu được lượt thi vào lịch sử.";
-
-                console.error(error);
-            }
-
-            if (saveMessage) {
-                saveMessage.textContent =
-                    "Đã lưu kết quả trong tab này.";
-            }
-        } catch (error) {
-            submitMessage.textContent +=
-                " Không lưu được dữ liệu để mở trang kết quả.";
-
-            if (saveMessage) {
-                saveMessage.textContent =
-                    "Không lưu được kết quả. Hãy giữ trang này để xem điểm.";
-            }
-
-            console.error(error);
-        }
-
-        if (resultSaved) {
-            try {
-                sessionStorage.removeItem(draftKey);
-            } catch (error) {
-                if (saveMessage) {
-                    saveMessage.textContent =
-                        "Đã lưu kết quả, nhưng chưa xóa được bản bài đang làm.";
-                }
-
-                console.error(error);
-            }
-        }
-
-        updateNavigation();
-    }
-
-    // 12. Cập nhật thời gian.
-    function updateTimer() {
-        if (isSubmitted) {
-            return;
-        }
-
-        const remainingSeconds = getRemainingSeconds();
-
-        renderTime(remainingSeconds);
-
-        if (remainingSeconds === 0) {
-            finishExam("timeout");
-        }
-    }
-
-    // 13. Điều hướng bằng số câu.
-    questionButtons.forEach(function (button) {
-        button.addEventListener("click", function () {
-            updateTimer();
-            showQuestion(button.dataset.question, true);
-        });
-    });
-
-    // 14. Ghi nhận lựa chọn trước thời hạn.
-    examForm.addEventListener("change", function (event) {
-        if (
-            !(event.target instanceof HTMLInputElement) ||
-            event.target.type !== "radio"
-        ) {
-            return;
-        }
-
-        if (isSubmitted) {
-            renderSelectedAnswers();
-            return;
-        }
-
-        if (Date.now() >= deadline) {
-            // Không nhận thay đổi diễn ra sau thời hạn.
-            renderSelectedAnswers();
-            updateTimer();
-            return;
-        }
-
-        selectedAnswers = readAnswersFromForm();
-
-        updateNavigation();
-        saveDraft();
-    });
-
-    // 15. Đánh dấu câu cần xem lại.
-    flagButton.addEventListener("click", function () {
-        if (isSubmitted) {
-            return;
-        }
-
-        if (Date.now() >= deadline) {
-            updateTimer();
-            return;
-        }
-
-        if (flaggedQuestions.has(currentQuestion)) {
-            flaggedQuestions.delete(currentQuestion);
+        if (ending || Date.now() >= deadline()) {
+            open.endedAt = new Date(at).toISOString();
         } else {
-            flaggedQuestions.add(currentQuestion);
+            open.visibleAt = new Date(at).toISOString();
         }
 
-        updateNavigation();
-        saveDraft();
-    });
+        persist();
+    }
 
-    // 16. Câu trước và câu tiếp.
-    previousButton.addEventListener("click", function () {
-        updateTimer();
+    async function flushEvents() {
+        for (const event of [...events]) {
+            const payload = { ...event };
+            const before = JSON.stringify(event);
 
-        const index = questionNumbers.indexOf(currentQuestion);
+            await api.request(
+                "/attempts/" + encodeURIComponent(attempt.attemptId) +
+                "/leave-events",
+                { method: "POST", body: payload }
+            );
 
-        if (index > 0) {
-            showQuestion(questionNumbers[index - 1], true);
+            if (
+                (payload.visibleAt || payload.endedAt) &&
+                JSON.stringify(event) === before
+            ) {
+                events = events.filter(item => item !== event);
+            }
+
+            persist();
         }
-    });
+    }
 
-    nextButton.addEventListener("click", function () {
-        updateTimer();
+    function complete() {
+        finished = true;
+        clearInterval(interval);
 
-        const index = questionNumbers.indexOf(currentQuestion);
-
-        if (index < questionNumbers.length - 1) {
-            showQuestion(questionNumbers[index + 1], true);
+        try {
+            sessionStorage.removeItem(journalKey);
+        } catch {
+            // Kết quả đã nằm trên máy chủ.
         }
+
+        location.replace(
+            "report.html?attemptId=" +
+            encodeURIComponent(attempt.attemptId)
+        );
+    }
+
+    async function recoverConflict(error, operation) {
+        const state = await api.request(
+            "/attempts/" + encodeURIComponent(attempt.attemptId)
+        );
+
+        if (state.status !== "in_progress") {
+            complete();
+            return;
+        }
+
+        const serverAnswers = normalizeAnswers(state);
+
+        if (state.syncVersion !== attempt.syncVersion) {
+            // Chấp nhận trường hợp request đã được lưu nhưng mất phản hồi.
+            const matchesCurrent = sameAnswers(serverAnswers, answers);
+            const matchesSent = lastSent &&
+                lastSent.expectedSync === attempt.syncVersion &&
+                sameAnswers(serverAnswers, lastSent.answers) &&
+                state.currentQuestion === lastSent.currentQuestion;
+
+            if (!matchesCurrent && !matchesSent) {
+                showConflict();
+                return;
+            }
+
+            attempt.syncVersion = state.syncVersion;
+            lastSent = null;
+            revision++;
+            persist();
+
+            text(
+                "#exam-save-message",
+                "Đã lấy lại phiên đồng bộ. Đang tiếp tục gửi dữ liệu…"
+            );
+            return;
+        }
+
+        // PATCH có thể đến máy chủ ngay sau lúc hết giờ.
+        if (
+            operation === "save" &&
+            (state.isExpired || Date.now() >= deadline())
+        ) {
+            ending = true;
+            closeEvent();
+            persist();
+            text("#timer-message", "Đã hết giờ. Đang gửi bài…");
+            return;
+        }
+
+        showConflict(
+            error.message +
+            " Bản nháp vẫn được giữ. Có thể tải lại trạng thái máy chủ."
+        );
+    }
+
+    async function synchronize() {
+        if (!attempt || finished || blocked || sending) return;
+
+        sending = true;
+        let operation = "events";
+        renderNavigation();
+
+        try {
+            if (ending) closeEvent();
+            await flushEvents();
+
+            if (ending) {
+                operation = "submit";
+
+                await api.request(
+                    "/attempts/" + encodeURIComponent(attempt.attemptId) +
+                    "/submit",
+                    {
+                        method: "POST",
+                        body: {
+                            expectedSync: attempt.syncVersion,
+                            answers: snapshot()
+                        }
+                    }
+                );
+
+                complete();
+                return;
+            }
+
+            if (
+                revision !== savedRevision &&
+                Date.now() < deadline()
+            ) {
+                operation = "save";
+
+                const sentRevision = revision;
+                const payload = {
+                    expectedSync: attempt.syncVersion,
+                    currentQuestion: current,
+                    answers: snapshot()
+                };
+
+                lastSent = payload;
+                persist();
+
+                const result = await api.request(
+                    "/attempts/" + encodeURIComponent(attempt.attemptId),
+                    { method: "PATCH", body: payload }
+                );
+
+                attempt.syncVersion = result.syncVersion;
+                savedRevision = sentRevision;
+                lastSent = null;
+                persist();
+            }
+
+            if (storageOK) {
+                text(
+                    "#exam-save-message",
+                    revision === savedRevision
+                        ? "Đã đồng bộ đáp án với máy chủ."
+                        : "Đang chờ đồng bộ thay đổi mới…"
+                );
+            }
+        } catch (error) {
+            if (error.status === 409) {
+                try {
+                    await recoverConflict(error, operation);
+                } catch (readError) {
+                    text(
+                        "#exam-save-message",
+                        readError.message +
+                        " Bản nháp được giữ; hệ thống sẽ thử lại."
+                    );
+                }
+            } else if (error.status === 401) {
+                blocked = true;
+                clearInterval(interval);
+                text(
+                    "#exam-submit-message",
+                    "Phiên đăng nhập hết hạn. Đăng nhập lại trong cùng " +
+                    "tab rồi mở lại URL lượt làm này để khôi phục."
+                );
+            } else {
+                text(
+                    "#exam-save-message",
+                    error.message +
+                    " Bản nháp được giữ trong tab; sẽ thử lại khi có kết nối."
+                );
+
+                if (ending) {
+                    text(
+                        "#exam-submit-message",
+                        "Chưa nhận được xác nhận nộp bài. Giữ trang mở; " +
+                        "hệ thống sẽ thử lại."
+                    );
+                }
+            }
+        } finally {
+            sending = false;
+            if (!finished) renderNavigation();
+        }
+    }
+
+    function tick() {
+        if (!attempt || finished || blocked) return;
+
+        const seconds = Math.max(
+            0,
+            Math.ceil((deadline() - Date.now()) / 1000)
+        );
+
+        text(
+            "#time-remaining",
+            String(Math.floor(seconds / 60)).padStart(2, "0") +
+            ":" + String(seconds % 60).padStart(2, "0")
+        );
+
+        if (seconds === 0 && !ending) {
+            ending = true;
+            closeEvent();
+            persist();
+            text("#timer-message", "Đã hết giờ. Đang gửi bài lên máy chủ…");
+            renderNavigation();
+            synchronize();
+        }
+    }
+
+    function restoreDraft(state) {
+        try {
+            const draft = JSON.parse(sessionStorage.getItem(journalKey));
+            if (!draft) return false;
+
+            const valid = Array.isArray(draft.answers) &&
+                draft.answers.length === answers.length &&
+                draft.answers.every((answer, index) =>
+                    answer.questionId === answers[index].questionId &&
+                    [null, "a", "b", "c", "d"].includes(
+                        answer.selectedAnswer
+                    ) &&
+                    typeof answer.isFlagged === "boolean"
+                );
+
+            if (!valid) return false;
+
+            events = Array.isArray(draft.events)
+                ? draft.events.filter(event =>
+                    event &&
+                    typeof event.eventId === "string" &&
+                    Number.isFinite(Date.parse(event.hiddenAt)) &&
+                    (!event.visibleAt ||
+                        Number.isFinite(Date.parse(event.visibleAt))) &&
+                    (!event.endedAt ||
+                        Number.isFinite(Date.parse(event.endedAt)))
+                )
+                : [];
+
+            leaveCount = Math.max(
+                leaveCount,
+                Number.isInteger(draft.leaveCount)
+                    ? draft.leaveCount : 0
+            );
+
+            ending = draft.ending === true;
+
+            if (!draft.dirty && !ending) return false;
+
+            const sent = draft.lastSent;
+            const matchesSent = sent &&
+                sent.expectedSync === draft.syncVersion &&
+                Array.isArray(sent.answers) &&
+                sameAnswers(sent.answers, answers) &&
+                state.currentQuestion === sent.currentQuestion;
+
+            const compatible =
+                draft.syncVersion === state.syncVersion ||
+                sameAnswers(draft.answers, answers) ||
+                matchesSent;
+
+            answers = draft.answers.map(answer => ({ ...answer }));
+
+            if (Number.isInteger(draft.current)) {
+                current = draft.current;
+            }
+
+            revision++;
+            return !compatible;
+        } catch {
+            text(
+                "#exam-save-message",
+                "Không đọc được bản nháp; đã lấy đáp án từ máy chủ."
+            );
+            return false;
+        }
+    }
+
+    async function mount(state) {
+        attempt = state;
+
+        if (state.status !== "in_progress") {
+            complete();
+            return;
+        }
+
+        if (
+            !state.exam ||
+            !Array.isArray(state.exam.questions) ||
+            !state.exam.questions.length ||
+            !Number.isFinite(deadline())
+        ) {
+            throw new Error("Dữ liệu lượt làm từ máy chủ không hợp lệ.");
+        }
+
+        const user = auth.getSession();
+        journalKey =
+            "matchday-attempt:" + user.accountId + ":" + state.attemptId;
+
+        revision = 0;
+        savedRevision = 0;
+        events = [];
+        ending = false;
+        blocked = false;
+        lastSent = null;
+        leaveCount = Number.isInteger(state.pageLeaveCount)
+            ? state.pageLeaveCount : 0;
+
+        answers = normalizeAnswers(state);
+        current = state.currentQuestion || 1;
+
+        const conflict = restoreDraft(state);
+
+        current = Math.max(1, Math.min(answers.length, current));
+
+        history.replaceState(
+            null,
+            "",
+            "exam.html?attemptId=" + encodeURIComponent(state.attemptId)
+        );
+
+        setExamInfo(state.exam, answers.length);
+        buildQuestions();
+
+        hide(gate, true);
+        hide(timerHeader, false);
+        hide(layout, false);
+        hide(monitor, false);
+        hide($("#view-report"), true);
+
+        renderNavigation();
+
+        clearInterval(interval);
+
+        if (conflict) {
+            showConflict();
+        } else {
+            if (document.visibilityState === "visible") closeEvent();
+            persist();
+            tick();
+            synchronize();
+
+            interval = setInterval(function () {
+                tick();
+                synchronize();
+            }, 1000);
+        }
+
+        try {
+            await window.MatchdayMath?.render(form);
+        } catch {
+            text(
+                "#math-status",
+                "Chưa hiển thị được công thức; nội dung văn bản vẫn còn."
+            );
+        }
+    }
+
+    $("#previous-question")?.addEventListener(
+        "click", () => move(current - 1)
+    );
+
+    $("#next-question")?.addEventListener(
+        "click", () => move(current + 1)
+    );
+
+    $("#flag-question")?.addEventListener("click", function () {
+        if (!editable()) return;
+
+        answers[current - 1].isFlagged =
+            !answers[current - 1].isFlagged;
+
+        revision++;
+        persist();
+        renderNavigation();
     });
 
-    // 17. Xác nhận nộp bài.
-    examForm.addEventListener("submit", function (event) {
+    form.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        if (isSubmitted) {
-            return;
+        if (!attempt || finished || blocked || sending) return;
+
+        if (!ending) {
+            const remaining = answers.filter(
+                answer => answer.selectedAnswer === null
+            ).length;
+
+            if (!confirm(
+                `Bạn còn ${remaining} câu chưa trả lời. Nộp bài?`
+            )) return;
+
+            ending = true;
+            closeEvent();
+            persist();
         }
 
-        if (Date.now() >= deadline) {
-            updateTimer();
-            return;
-        }
-
-        const unansweredCount = selectedAnswers.filter(function (answer) {
-            return answer === null;
-        }).length;
-
-        const confirmationMessage = unansweredCount > 0
-            ? "Bạn còn " + unansweredCount +
-                " câu chưa trả lời. Bạn muốn nộp bài?"
-            : "Bạn đã trả lời tất cả câu hỏi. Bạn muốn nộp bài?";
-
-        const confirmed = window.confirm(confirmationMessage);
-
-        // Thời gian vẫn chạy trong lúc hộp xác nhận mở.
-        if (Date.now() >= deadline) {
-            updateTimer();
-            return;
-        }
-
-        if (confirmed) {
-            finishExam("manual");
-        }
-    });
-
-    // 18. Đồng bộ thời gian khi quay lại trang.
-    document.addEventListener("visibilitychange", function () {
-        if (document.visibilityState === "visible") {
-            updateTimer();
-        }
-    });
-
-    window.addEventListener("pageshow", function () {
-        updateTimer();
-
-        // Đồng bộ lại input khi trình duyệt khôi phục trang.
-        renderSelectedAnswers();
-    });
-
-    window.addEventListener("pagehide", function () {
-        saveDraft();
-    });
-
-    // 19. Khôi phục và khởi động bài thi.
-    restoreDraft();
-    renderSelectedAnswers();
-    showQuestion(currentQuestion, false);
-
-    submitButton.disabled = false;
-
-    if (monitor) {
-        monitor.start(
-            function () {
-                return !isSubmitted && Date.now() < deadline;
-            },
-            restoredLeaveCount,
-            saveDraft,
-            restoredLeaveEvents,
-            deadline
+        text(
+            "#exam-submit-message",
+            "Đang nộp bài. Giữ trang mở đến khi nhận kết quả."
         );
 
-        monitorStarted = true;
+        renderNavigation();
+        synchronize();
+    });
+
+    document.addEventListener("visibilitychange", function () {
+        if (!attempt || finished || blocked) return;
+
+        if (document.visibilityState === "hidden" && editable()) {
+            const hasOpenEvent = events.some(event =>
+                !event.visibleAt && !event.endedAt
+            );
+
+            if (!hasOpenEvent) {
+                events.push({
+                    eventId: crypto.randomUUID(),
+                    hiddenAt: new Date().toISOString()
+                });
+
+                leaveCount++;
+                persist();
+                text("#page-leave-count", leaveCount);
+            }
+        } else if (document.visibilityState === "visible") {
+            closeEvent();
+            tick();
+        }
+
+        synchronize();
+    });
+
+    window.addEventListener("online", synchronize);
+    window.addEventListener("pagehide", persist);
+
+    async function initialize() {
+        if (!api || !auth) {
+            throw new Error("Chưa tải được API hoặc phiên đăng nhập.");
+        }
+
+        await auth.ready;
+        if (!auth.getSession()) return;
+
+        const attemptId = params.get("attemptId");
+
+        if (attemptId) {
+            await mount(await api.request(
+                "/attempts/" + encodeURIComponent(attemptId)
+            ));
+            return;
+        }
+
+        const versionId = params.get("examVersionId");
+
+        if (!versionId) {
+            throw new Error("Hãy chọn đề từ Đề mẫu hoặc Đề của tôi.");
+        }
+
+        const [mine, sample] = await Promise.all([
+            api.request("/exams?scope=mine"),
+            api.request("/exams?scope=sample")
+        ]);
+
+        const exam = [...mine, ...sample].find(
+            item => item.examVersionId === versionId
+        );
+
+        if (!exam) {
+            throw new Error("Không tìm thấy phiên bản đề có thể bắt đầu.");
+        }
+
+        // Cập nhật ngay khi mở trang, không đợi bấm Bắt đầu.
+        setExamInfo(exam, exam.questionCount);
+
+        if (!gate || !startButton) {
+            throw new Error("Trang thi thiếu nút hoặc phần chuẩn bị làm bài.");
+        }
+
+        hide(gate, false);
+        startButton.disabled = false;
+
+        const clientAttemptId = crypto.randomUUID();
+        let starting = false;
+
+        startButton.addEventListener("click", async function () {
+            if (starting) return;
+
+            starting = true;
+            startButton.disabled = true;
+            text("#preflight-message", "Đang mở lượt làm…");
+
+            try {
+                const state = await api.request("/attempts", {
+                    method: "POST",
+                    body: {
+                        examVersionId: versionId,
+                        clientAttemptId
+                    }
+                });
+
+                await mount(state);
+                text("#preflight-message", "");
+            } catch (error) {
+                text("#preflight-message", error.message);
+                startButton.disabled = false;
+            } finally {
+                starting = false;
+            }
+        });
     }
 
-    timerInterval = setInterval(updateTimer, 1000);
-
-    updateTimer();
-
-    if (!isSubmitted) {
-        saveDraft();
-    }
-}
-}).catch(function (error) { console.error("Không khởi tạo được trang:", error.message); });
+    initialize().catch(function (error) {
+        console.error("Không khởi tạo được trang thi:", error);
+        hide(gate, false);
+        text("#preflight-message", error.message);
+        text("#exam-submit-message", error.message);
+        if (startButton) startButton.disabled = true;
+    });
+})();
