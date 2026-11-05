@@ -262,114 +262,237 @@
         });
     }
 
-    // Quên mật khẩu: hiện chưa có API gửi OTP.
-    const forgotForm = document.querySelector("#forgot-password-form");
+        // Khôi phục mật khẩu qua OTP.
+        const forgotForm = document.querySelector("#forgot-password-form");
+        const resetForm = document.querySelector("#reset-password-form");
 
-    if (forgotForm) {
-        const message = forgotForm.querySelector("#forgot-message");
-        const button = forgotForm.querySelector(".auth-submit");
+        if (forgotForm && resetForm) {
+            const emailInput = forgotForm.querySelector("#recovery-email");
+            const forgotMessage = forgotForm.querySelector("#forgot-message");
+            const requestButton = forgotForm.querySelector(".auth-submit");
 
-        prepareSubmit(button);
+            const otpInput = resetForm.querySelector("#otp");
+            const passwordInput = resetForm.querySelector("#new-password");
+            const confirmInput =
+                resetForm.querySelector("#confirm-new-password");
 
-        forgotForm.addEventListener("submit", function (event) {
-            event.preventDefault();
+            const resetMessage = resetForm.querySelector("#reset-message");
+            const resetButton = resetForm.querySelector(".auth-submit");
+            const backButton = document.querySelector("#back-to-email");
+            const previewButton = document.querySelector("#preview-reset");
 
-            if (!forgotForm.reportValidity()) return;
+            let recoveryEmail = "";
+            let requesting = false;
+            let resetting = false;
+            let cooldownUntil = 0;
 
-            message.textContent =
-                "Email đúng định dạng. Chức năng gửi OTP chưa được kết nối.";
-        });
+            prepareSubmit(requestButton);
+            prepareSubmit(resetButton);
 
-        forgotForm.addEventListener("input", function () {
-            message.textContent = "";
-        });
-    }
+            if (previewButton) previewButton.hidden = true;
 
-    // Xem thử giao diện đặt lại mật khẩu.
-    const resetForm = document.querySelector("#reset-password-form");
-    const previewResetButton = document.querySelector("#preview-reset");
-
-    if (resetForm && previewResetButton && forgotForm) {
-        const otpInput = resetForm.querySelector("#otp");
-        const passwordInput = resetForm.querySelector("#new-password");
-        const confirmInput =
-            resetForm.querySelector("#confirm-new-password");
-        const message = resetForm.querySelector("#reset-message");
-        const button = resetForm.querySelector(".auth-submit");
-        const backButton = document.querySelector("#back-to-email");
-
-        prepareSubmit(button);
-        previewResetButton.type = "button";
-
-        previewResetButton.addEventListener("click", function () {
-            if (!forgotForm.reportValidity()) return;
-
-            forgotForm.hidden = true;
-            previewResetButton.hidden = true;
-            resetForm.hidden = false;
-            otpInput.focus();
-        });
-
-        resetForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            if (!resetForm.reportValidity()) return;
-
-            message.textContent = "";
-
-            if (passwordInput.value.length < 8) {
-                message.textContent =
-                    "Mật khẩu mới cần có ít nhất 8 ký tự.";
-                passwordInput.focus();
-                return;
+            const help = resetForm.querySelector(".form-help");
+            if (help) {
+                help.textContent =
+                    "Nhập mã OTP trong email và mật khẩu mới. " +
+                    "Mã có hiệu lực 10 phút; chỉ mã được gửi gần nhất còn hiệu lực.";
             }
 
-            if (passwordInput.value !== confirmInput.value) {
-                message.textContent = "Mật khẩu nhập lại chưa khớp.";
-                confirmInput.focus();
-                return;
+            passwordInput.maxLength = 128;
+            confirmInput.maxLength = 128;
+
+            const resendButton = document.createElement("button");
+            resendButton.type = "button";
+            resendButton.className = "password-toggle";
+            resendButton.textContent = "Gửi lại OTP";
+
+            resetButton.after(resendButton);
+
+            const loginLink = document.createElement("a");
+            loginLink.href = "login.html";
+            loginLink.className = "secondary-button";
+            loginLink.textContent = "Về đăng nhập";
+            loginLink.hidden = true;
+            resetMessage.after(loginLink);
+
+            function refreshCooldown() {
+                const seconds = Math.max(
+                    0,
+                    Math.ceil((cooldownUntil - Date.now()) / 1000)
+                );
+
+                resendButton.disabled =
+                    requesting || resetting || seconds > 0;
+
+                resendButton.textContent = seconds > 0
+                    ? `Gửi lại OTP sau ${seconds}s`
+                    : "Gửi lại OTP";
             }
 
-            message.textContent =
-                "Dữ liệu đúng định dạng. Chức năng xác minh OTP và đổi mật khẩu chưa được kết nối.";
-        });
+            async function requestOTP(email) {
+                if (!getAuth().apiMode) {
+                    throw new Error(
+                        "Khôi phục mật khẩu cần bật kết nối backend."
+                    );
+                }
 
-        resetForm.addEventListener("input", function () {
-            message.textContent = "";
-        });
+                const result = await getAPI().request("/forgot-password", {
+                    method: "POST",
+                    auth: false,
+                    body: { email }
+                });
 
-        if (backButton) {
-            backButton.type = "button";
+                cooldownUntil = Date.now() + 60000;
+                refreshCooldown();
+                return result;
+            }
 
-            backButton.addEventListener("click", function () {
-                resetForm.hidden = true;
-                forgotForm.hidden = false;
-                previewResetButton.hidden = false;
+            forgotForm.addEventListener("submit", async function (event) {
+                event.preventDefault();
 
-                resetForm.reset();
-                message.textContent = "";
+                if (requesting || !forgotForm.reportValidity()) return;
 
-                resetForm
-                    .querySelectorAll(".password-toggle[data-target]")
-                    .forEach(function (toggle) {
-                        const input = document.getElementById(
-                            toggle.dataset.target
-                        );
+                requesting = true;
+                requestButton.disabled = true;
+                forgotMessage.textContent = "Đang yêu cầu mã OTP…";
 
-                        if (!input) return;
+                try {
+                    const email = emailInput.value.trim().toLowerCase();
+                    const result = await requestOTP(email);
 
-                        input.type = "password";
-                        toggle.textContent = "Hiện mật khẩu";
-                        toggle.setAttribute("aria-pressed", "false");
+                    recoveryEmail = email;
+                    forgotForm.hidden = true;
+                    resetForm.hidden = false;
+                    resetForm.reset();
+                    loginLink.hidden = true;
+                    resetButton.disabled = false;
+                    resetMessage.textContent = result.message;
+                    otpInput.focus();
+                } catch (error) {
+                    forgotMessage.textContent =
+                        error.message || "Không yêu cầu được mã OTP.";
+                } finally {
+                    requesting = false;
+                    requestButton.disabled = false;
+                    refreshCooldown();
+                }
+            });
+
+            resendButton.addEventListener("click", async function () {
+                if (
+                    requesting || resetting ||
+                    Date.now() < cooldownUntil ||
+                    !recoveryEmail
+                ) return;
+
+                requesting = true;
+                resetButton.disabled = true;
+                refreshCooldown();
+                resetMessage.textContent = "Đang yêu cầu mã mới…";
+
+                try {
+                    const result = await requestOTP(recoveryEmail);
+                    otpInput.value = "";
+                    resetMessage.textContent = result.message;
+                    otpInput.focus();
+                } catch (error) {
+                    resetMessage.textContent =
+                        error.message || "Không gửi lại được mã OTP.";
+                } finally {
+                    requesting = false;
+                    resetButton.disabled = false;
+                    refreshCooldown();
+                }
+            });
+
+            resetForm.addEventListener("submit", async function (event) {
+                event.preventDefault();
+
+                if (
+                    resetting || requesting ||
+                    !resetForm.reportValidity()
+                ) return;
+
+                resetMessage.textContent = "";
+
+                if (!recoveryEmail) {
+                    resetMessage.textContent =
+                        "Hãy quay lại bước nhập email để yêu cầu OTP.";
+                    return;
+                }
+
+                if (passwordInput.value !== confirmInput.value) {
+                    resetMessage.textContent =
+                        "Mật khẩu nhập lại chưa khớp.";
+                    confirmInput.focus();
+                    return;
+                }
+
+                resetting = true;
+                resetButton.disabled = true;
+                if (backButton) backButton.disabled = true;
+                refreshCooldown();
+
+                let success = false;
+
+                try {
+                    const result = await getAPI().request("/reset-password", {
+                        method: "POST",
+                        auth: false,
+                        body: {
+                            email: recoveryEmail,
+                            otp: otpInput.value.trim(),
+                            new_password: passwordInput.value
+                        }
                     });
 
-                const emailInput =
-                    forgotForm.querySelector("#recovery-email");
+                    success = true;
+                    resetForm.reset();
 
-                if (emailInput) emailInput.focus();
+                    // Xóa token trong tab hiện tại, yêu cầu đăng nhập lại.
+                    getAPI().clearToken();
+
+                    resetMessage.textContent = result.message;
+                    loginLink.hidden = false;
+                    resendButton.hidden = true;
+                    if (backButton) backButton.hidden = true;
+                    resetButton.textContent = "Đã đổi mật khẩu";
+                } catch (error) {
+                    resetMessage.textContent =
+                        error.message || "Không đổi được mật khẩu.";
+                } finally {
+                    resetting = false;
+                    resetButton.disabled = success;
+                    if (backButton) backButton.disabled = false;
+                    refreshCooldown();
+                }
             });
+
+            if (backButton) {
+                backButton.type = "button";
+
+                backButton.addEventListener("click", function () {
+                    if (requesting || resetting) return;
+
+                    resetForm.hidden = true;
+                    forgotForm.hidden = false;
+                    resetForm.reset();
+                    resetMessage.textContent = "";
+                    forgotMessage.textContent = "";
+                    emailInput.focus();
+                });
+            }
+
+            forgotForm.addEventListener("input", function () {
+                forgotMessage.textContent = "";
+            });
+
+            const cooldownTimer = setInterval(refreshCooldown, 1000);
+
+            window.addEventListener("pagehide", function () {
+                clearInterval(cooldownTimer);
+            }, { once: true });
         }
-    }
 
     if (window.MatchdayAuth && window.MatchdayAuth.apiMode) {
         document.querySelectorAll(".md-demo-notice").forEach(function (el) {
