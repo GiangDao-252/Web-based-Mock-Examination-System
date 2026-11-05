@@ -1,58 +1,62 @@
 # MATCHDAY — Web-based Mock Examination System
 
-![Status](https://img.shields.io/badge/Status-Frontend%20MVP-DB0007)
+![Status](https://img.shields.io/badge/Status-Local%20Integrated%20MVP-DB0007)
 ![Platform](https://img.shields.io/badge/Platform-Web--based-lightgrey)
 ![Scope](https://img.shields.io/badge/Scope-Student%20Self--practice-1C2C5B)
 
-**MATCHDAY** là hệ thống thi thử trực tuyến dành cho học sinh, hỗ trợ quản lý đề cá nhân, luyện tập có giới hạn thời gian, xem lại bài làm và theo dõi kết quả qua từng lượt luyện tập.
+**MATCHDAY** là hệ thống thi thử dành cho học sinh, hỗ trợ quản lý đề cá nhân, luyện tập có giới hạn thời gian, xem lại bài làm và theo dõi kết quả.
 
-Dự án hiện tập trung vào **MVP dành cho một nhóm người dùng là học sinh**. Giao diện sử dụng phong cách bóng đá với màu đỏ–trắng và nhận diện MATCHDAY.
+Hệ thống sử dụng **HTML/CSS/JavaScript**, **FastAPI** và **PostgreSQL**. Tài khoản, hồ sơ, đề thi, đáp án và kết quả được lưu trong database. Trình duyệt giữ bản nháp tạm thời để hỗ trợ khôi phục bài đang làm.
 
-> Hiện tại, hệ thống hoạt động dưới dạng frontend HTML/CSS/JavaScript. Đăng nhập là mô phỏng; đề thi, hồ sơ và lịch sử được lưu trong trình duyệt. Backend và cơ sở dữ liệu sẽ được tích hợp ở giai đoạn tiếp theo.
+Giao diện mang phong cách bóng đá với nhận diện MATCHDAY và màu đỏ–trắng.
 
-## 1. Mục tiêu
+> Phiên bản nộp bài chạy trên môi trường local. Không yêu cầu triển khai công khai. Frontend, backend và PostgreSQL cần hoạt động đồng thời để sử dụng đầy đủ chức năng.
 
-- Cung cấp môi trường tự luyện thi dễ sử dụng trên máy tính và điện thoại.
-- Cho phép học sinh tạo, tải lên và chỉnh sửa đề cá nhân.
-- Hỗ trợ câu hỏi trắc nghiệm có công thức toán học.
-- Lưu kết quả và nội dung bài làm để xem lại.
-- So sánh các lượt luyện tập dùng cùng đề và phiên bản.
-- Ghi nhận việc trang thi bị ẩn để học sinh tự đánh giá sự tập trung.
+## 1. Mục tiêu và phạm vi
 
-MVP không có giao diện giáo viên, giám thị hoặc chức năng AI giám sát.
+- Cung cấp môi trường tự luyện thi trên máy tính và màn hình nhỏ.
+- Cho phép học sinh tạo, nhập JSON và chỉnh sửa đề cá nhân.
+- Hiển thị câu hỏi, lựa chọn và lời giải có công thức toán học.
+- Đồng bộ đáp án và lưu kết quả theo tài khoản.
+- Xem lại các lượt thi và so sánh kết quả của cùng phiên bản đề.
+- Ghi nhận trạng thái trang thi bị ẩn để hỗ trợ tự đánh giá sự tập trung.
 
-## 2. Tính năng hiện có
+Hệ thống tập trung vào **học sinh tự luyện tập**. Không có giao diện giáo viên, quản trị viên, giám thị hoặc AI giám sát.
+
+## 2. Tính năng
 
 ### 2.1. Tài khoản và trang cá nhân
 
-- Đăng nhập và đăng xuất bằng tài khoản demo.
-- Chuyển về trang đăng nhập khi truy cập trang học sinh chưa có phiên.
-- Lưu tên hiển thị và mục tiêu học tập trong trình duyệt.
-- Hiển thị số lượt thi, điểm trung bình và điểm cao nhất.
-- Hiển thị ba lượt luyện tập gần nhất.
-- Lưu toàn bộ lịch sử, không tự cắt bỏ các lượt cũ theo số lượng cố định.
+- Đăng ký tài khoản.
+- Đăng nhập bằng email và mật khẩu.
+- Băm mật khẩu và cấp JWT tại backend.
+- Kiểm tra phiên trước khi mở các trang được bảo vệ.
+- Đăng xuất bằng cách xóa phiên/token phía trình duyệt.
+- Cập nhật tên hiển thị và mục tiêu học tập.
+- Lưu thông tin tài khoản và hồ sơ trong PostgreSQL.
+- Hiển thị số lượt đã hoàn thành, điểm trung bình và điểm cao nhất.
+- Hiển thị ba lượt hoàn thành gần nhất và liên kết xem lại.
 
-Đăng ký tài khoản thật, quản lý mật khẩu và khôi phục qua email/OTP chưa được kết nối backend.
+**Khôi phục mật khẩu qua email/OTP chưa hoàn thiện.** Phần này đang tạm dừng do lỗi xác thực SMTP và không thuộc luồng demo hoàn chỉnh.
 
 ### 2.2. Đề mẫu và đề cá nhân
 
 - Chọn đề mẫu để luyện tập.
-- Nhập file JSON hoặc tạo đề trực tiếp trên giao diện.
-- Đặt tên và thời lượng làm bài.
+- Nhập file JSON hoặc tạo đề trực tiếp.
+- Đặt tên và thời lượng.
 - Thêm, sửa và xóa câu hỏi.
-- Chỉnh sửa bốn lựa chọn A–D và đáp án đúng.
+- Nhập bốn lựa chọn A–D và một đáp án đúng.
 - Bổ sung lời giải tùy chọn.
-- Xem trước nội dung trước khi lưu.
-- Sửa hoặc xóa đề cá nhân đã lưu.
-- Tăng phiên bản khi nội dung đề thay đổi.
-- Phát hiện trường hợp đề đã bị chỉnh sửa ở tab khác trước khi ghi đè.
-
-Giới hạn hiện tại:
+- Xem trước nội dung và công thức trước khi lưu.
+- Tải đề cá nhân dưới dạng JSON.
+- Chỉnh sửa đề bằng cách tạo phiên bản mới.
+- Kiểm tra quyền sở hữu khi truy cập hoặc chỉnh sửa đề.
+- Giữ phiên bản đã xuất bản để bảo toàn nội dung các lượt thi cũ.
 
 | Nội dung | Giới hạn |
 | --- | --- |
 | Định dạng nhập file | JSON |
-| Kích thước file | Tối đa 1 MB |
+| Kích thước file nhập | Tối đa 1 MB |
 | Số câu hỏi | 1–100 câu |
 | Lựa chọn mỗi câu | Bốn lựa chọn A–D |
 | Đáp án đúng | Một đáp án mỗi câu |
@@ -62,20 +66,15 @@ PDF, Word và nhận dạng nội dung từ ảnh chưa được hỗ trợ.
 
 ### 2.3. Công thức toán học
 
-Hệ thống sử dụng **MathJax** để hiển thị công thức LaTeX trong:
+MathJax hiển thị công thức LaTeX trong câu hỏi, lựa chọn, lời giải, bản xem trước và báo cáo.
 
-- Nội dung câu hỏi.
-- Các lựa chọn.
-- Lời giải.
-- Bản xem trước và báo cáo sau bài thi.
-
-Ví dụ nhập trên giao diện:
+Ví dụ nhập trực tiếp:
 
 ```latex
 Tính tích phân \( \int_0^1 x^2\,dx \).
 ```
 
-Trong JSON, dấu `\` phải được viết thành `\\`:
+Trong chuỗi JSON, dấu `\` cần được viết thành `\\`:
 
 ```json
 {
@@ -83,208 +82,361 @@ Trong JSON, dấu `\` phải được viết thành `\\`:
 }
 ```
 
-MathJax được đóng gói cùng frontend. Chức năng này dùng để hiển thị công thức, chưa hỗ trợ nhận dạng công thức từ ảnh hoặc chấm tự luận toán.
+MathJax được đóng gói trong frontend. Hệ thống chưa hỗ trợ nhận dạng công thức từ ảnh hoặc chấm tự luận toán.
 
 ### 2.4. Làm bài thi
 
-- Hiển thị thông tin đề, quy tắc chấm và cách ghi nhận rời trang trước khi bắt đầu.
-- Chỉ chạy đồng hồ sau khi học sinh bấm **Bắt đầu**.
-- Chọn đáp án và chuyển câu bằng bảng số hoặc nút trước/tiếp.
-- Đổi màu số câu đã trả lời.
-- Gắn hoặc bỏ cờ cho câu cần xem lại.
-- Hiển thị số câu đã trả lời.
-- Cảnh báo khi thời gian còn ít.
-- Xác nhận trước khi nộp bài.
-- Tự kết thúc khi hết thời gian.
-- Khóa thay đổi đáp án sau khi kết thúc.
-- Khôi phục tiến độ và hạn giờ ban đầu khi tải lại trang trong cùng tab.
+- Hiển thị tên đề, phiên bản, số câu, thời lượng và hướng dẫn trước khi bắt đầu.
+- Tạo hoặc khôi phục lượt thi thông qua backend.
+- Sử dụng thời điểm bắt đầu và hạn giờ được lưu tại database.
+- Chọn đáp án, chuyển câu và đánh dấu câu cần xem lại.
+- Hiển thị tiến độ trả lời và thời gian còn lại.
+- Đồng bộ đáp án, cờ đánh dấu và câu hiện tại với backend.
+- Giữ bản nháp trong cùng tab để hỗ trợ khôi phục.
+- Xác nhận trước khi nộp.
+- Gửi yêu cầu kết thúc khi hết giờ; database xác định trạng thái cuối cùng.
+- Không cho chỉnh sửa lượt đã hoàn tất qua luồng lưu thông thường.
 
-Rời trang hoặc tải lại không làm dừng đồng hồ của lượt thi đã bắt đầu.
+Tải lại trang hoặc chuyển tab không khởi động lại hạn giờ.
 
-### 2.5. Tự đánh giá sự tập trung
+Việc khôi phục phụ thuộc vào trạng thái đã lưu và bản nháp còn tồn tại. Hệ thống không cam kết khôi phục mọi thay đổi chưa đồng bộ khi đóng tab hoặc xóa dữ liệu trình duyệt.
 
-- Hiển thị số lần trang thi bị ẩn.
-- Thông báo số lần ghi nhận khi học sinh quay lại.
-- Lưu thời điểm trang bị ẩn và quay lại.
-- Hiển thị nhật ký trong báo cáo sau bài thi.
-- Ghi nhận trường hợp bài kết thúc khi trang vẫn còn ẩn.
+### 2.5. Ghi nhận rời trang
 
-Chỉ số này phản ánh trạng thái hiển thị của trang, không xác định nguyên nhân rời trang và không được dùng để kết luận gian lận.
+- Ghi nhận sự kiện trang thi bị ẩn và quay lại.
+- Gửi mã sự kiện và các mốc thời gian tới backend.
+- Lưu sự kiện theo lượt thi.
+- Hiển thị số lần rời trang trong kết quả.
 
-Hệ thống không chặn đổi tab, không tự đình chỉ và không trừ điểm theo chỉ số này.
+Chỉ số này phản ánh trạng thái hiển thị của trình duyệt. Nó không xác định nguyên nhân rời trang, không chứng minh gian lận và không ảnh hưởng điểm số.
 
-### 2.6. Kết quả và lịch sử
+Hệ thống không chặn đổi tab hoặc tự đình chỉ bài thi theo chỉ số này.
 
-- Hiển thị điểm, số câu đúng, sai và chưa trả lời.
-- Hiển thị đáp án đã chọn và đáp án đúng.
-- Hiển thị lời giải nếu được cung cấp.
-- Lọc câu đúng, sai hoặc chưa trả lời khi xem lại.
-- Hiển thị trạng thái nộp chủ động hoặc hết giờ.
-- Lưu bản nội dung câu hỏi, lựa chọn và lời giải kèm kết quả.
-- Giữ bài làm cũ khi đề gốc được sửa hoặc xóa.
-- So sánh các lượt có cùng mã đề, phiên bản, nội dung và thời lượng.
+### 2.6. Kết quả, lịch sử và so sánh
 
-Các kết quả cũ thiếu thông tin phiên bản vẫn có thể xem lại khi dữ liệu hợp lệ, nhưng không được tự động ghép nhóm chỉ dựa trên tên đề.
+- Lấy điểm và thống kê từ database.
+- Hiển thị số câu đúng, sai và chưa trả lời.
+- Xem đáp án đã chọn, đáp án đúng và lời giải.
+- Mở báo cáo bằng URL có `?attemptId=...`.
+- Giới hạn quyền xem báo cáo theo tài khoản sở hữu lượt thi.
+- Giữ kết quả gắn với phiên bản đề đã làm.
+- Nhóm các lượt hoàn thành theo `examVersionId`.
+- So sánh điểm lượt mới nhất với lượt đầu trong nhóm.
+
+Chênh lệch điểm mô tả kết quả đã ghi nhận, không chứng minh hiệu quả học tập hoặc điều kiện làm bài tương đương. Hệ thống không quy đổi kết quả thành thứ hạng toàn quốc.
 
 ## 3. Quy tắc chấm điểm
-
-MVP sử dụng quy tắc chấm thống nhất:
 
 ```text
 Điểm = Số câu đúng / Tổng số câu × 10
 ```
 
-- Mỗi câu có trọng số bằng nhau.
+- Các câu có trọng số bằng nhau.
 - Câu sai hoặc bỏ trống không được tính điểm.
-- Điểm được làm tròn đến hai chữ số thập phân.
+- Điểm làm tròn đến hai chữ số thập phân.
 - Số câu sai không bao gồm câu chưa trả lời.
+- Database tính điểm và số câu đúng; không chấp nhận điểm do frontend tự khai báo.
+- Số lần rời trang không làm thay đổi điểm.
 
-## 4. Công nghệ
+## 4. Kiến trúc và công nghệ
 
-| Thành phần | Công nghệ hiện tại |
+| Thành phần | Công nghệ / vai trò |
 | --- | --- |
-| Giao diện | HTML5, CSS3 |
-| Xử lý trên trình duyệt | JavaScript |
-| Hiển thị công thức | MathJax 3.2.2 |
-| Lưu đề, hồ sơ và lịch sử | localStorage |
-| Lưu phiên demo, tiến độ và kết quả hiện tại | sessionStorage |
-| Chạy frontend khi phát triển | HTTP server cục bộ, ví dụ VS Code Live Server |
+| Frontend | HTML5, CSS3, JavaScript |
+| Giao tiếp API | Fetch API, JSON, Bearer token |
+| Backend | Python, FastAPI, Uvicorn |
+| Kiểm tra dữ liệu | Pydantic |
+| Xác thực | JWT; Argon2 cho mật khẩu mới |
+| Tương thích dữ liệu seed | Xác minh mật khẩu PBKDF2 |
+| Database | PostgreSQL |
+| Truy cập database | Psycopg |
+| Logic dữ liệu | Constraints, functions, triggers, views |
+| Công thức toán | MathJax |
+| Bản nháp trình duyệt | sessionStorage |
 | Quản lý mã nguồn | Git, GitHub |
 
-Công nghệ backend, cơ sở dữ liệu và phương án triển khai sẽ được nhóm thống nhất ở giai đoạn tiếp theo.
+Luồng xử lý chính:
 
-## 5. Cấu trúc thư mục
+1. Trình duyệt gửi yêu cầu tới API.
+2. Backend kiểm tra token, dữ liệu và quyền truy cập.
+3. Backend truy vấn hoặc gọi hàm PostgreSQL.
+4. Database áp dụng các quy tắc toàn vẹn và xử lý dữ liệu.
+5. Backend trả JSON để frontend cập nhật giao diện.
 
-```text
-Web-based-Mock-Examination-System/
-├── Frontend/
-│   ├── index.html
-│   ├── auth/
-│   │   ├── login.html
-│   │   ├── register.html
-│   │   └── forgot-password.html
-│   ├── student/
-│   │   ├── profile.html
-│   │   ├── exams.html
-│   │   ├── my-exams.html
-│   │   ├── upload-exam.html
-│   │   ├── exam.html
-│   │   └── report.html
-│   ├── assets/
-│   │   ├── css/
-│   │   ├── js/
-│   │   └── vendor/
-│   │       └── mathjax/
-│   └── data/
-│       └── de-toan.json
-├── Proposal.html
-├── lab.css
-└── README.md
-```
+Trình duyệt không kết nối trực tiếp tới PostgreSQL.
 
-Một số file JavaScript chính:
+## 5. Cấu trúc mã nguồn
+
+Các thành phần chính:
+
+| Đường dẫn | Nội dung |
+| --- | --- |
+| `Frontend/index.html` | Trang chủ |
+| `Frontend/auth/` | Đăng nhập, đăng ký, giao diện quên mật khẩu |
+| `Frontend/student/` | Hồ sơ, danh sách đề, biên soạn đề, làm bài, báo cáo |
+| `Frontend/assets/css/` | CSS dùng chung và theo trang |
+| `Frontend/assets/js/` | API client, xác thực và xử lý giao diện |
+| `Frontend/assets/vendor/mathjax/` | Thư viện hiển thị công thức |
+| `Frontend/data/` | Dữ liệu mẫu |
+| `Backend/app/main.py` | Khởi tạo ứng dụng và đăng ký router |
+| `Backend/app/config.py` | Cấu hình ứng dụng |
+| `Backend/app/database.py` | Kết nối PostgreSQL |
+| `Backend/app/security.py` | Băm mật khẩu và JWT |
+| `Backend/app/dependencies.py` | Dependency xác thực |
+| `Backend/app/routers/` | Các API theo tài nguyên |
+| `Backend/app/schemas/` | Schema request và response |
+| `Backend/app/services/` | Các xử lý hỗ trợ |
+| `Backend/requirements.txt` | Thư viện Python |
+| `matchday_database/` | Schema, seed và script kiểm tra |
+| `.github/workflows/` | Các workflow của repository |
+
+Các module frontend tích hợp chính:
 
 | File | Vai trò |
 | --- | --- |
-| `auth-session.js`, `auth-guard.js` | Phiên demo và điều hướng đăng nhập |
-| `exam-store.js` | Kiểm tra, lưu, sửa, xóa và quản lý phiên bản đề |
-| `upload-exam.js` | Nhập file, chỉnh sửa và xem trước đề |
-| `exam-loader.js` | Nạp đề được chọn |
-| `exam-engine.js` | Điều hướng câu, đồng hồ, tiến độ và kết thúc bài |
-| `security.js` | Ghi nhận trạng thái trang bị ẩn/quay lại |
-| `report.js`, `focus-report.js` | Báo cáo, lời giải và nhật ký tập trung |
-| `history.js`, `comparison.js` | Lịch sử và so sánh các lượt |
-| `profile-settings.js` | Thông tin cá nhân demo |
+| `api-config.js`, `api.js` | Cấu hình và gửi yêu cầu API |
+| `auth.js` | Giao diện đăng nhập và đăng ký |
+| `auth-session.js`, `auth-guard.js` | Phiên đăng nhập và bảo vệ trang |
+| `exam-catalogue.js` | Danh sách đề mẫu |
+| `my-exams.js` | Quản lý đề cá nhân |
+| `upload-exam.js` | Nhập, chỉnh sửa và xem trước đề |
+| `exam-engine.js` | Nạp lượt thi, đồng hồ, đáp án, đồng bộ và nộp bài |
+| `history.js`, `comparison.js` | Lịch sử và so sánh kết quả |
+| `profile-settings.js` | Cập nhật hồ sơ |
+| `report.js` | Đọc và hiển thị báo cáo từ API |
 | `math-render.js` | Hiển thị công thức |
-| `matchday.js` | Nhận diện MATCHDAY và thống kê trang cá nhân |
 
-## 6. Chạy dự án
+Repository có thể còn các module từ giai đoạn frontend demo. Sự hiện diện của file không đồng nghĩa module đó đang được dùng trong luồng API hiện tại.
 
-### Bước 1: Tải mã nguồn
+## 6. Cài đặt và chạy local
+
+### 6.1. Yêu cầu
+
+- Git.
+- Python và công cụ tạo môi trường ảo.
+- PostgreSQL đang hoạt động.
+- pgAdmin hoặc công cụ chạy SQL tương đương.
+- Trình duyệt hiện đại.
+
+Không cần `npm install` hoặc `npm start`.
+
+### 6.2. Tải mã nguồn
 
 ```bash
 git clone https://github.com/GiangDao-252/Web-based-Mock-Examination-System.git
 cd Web-based-Mock-Examination-System
 ```
 
-### Bước 2: Mở bằng VS Code
+### 6.3. Chuẩn bị database
 
-Mở thư mục dự án, cài extension **Live Server**, sau đó mở:
+Tạo database `matchday` trong PostgreSQL.
 
-```text
-Frontend/index.html
+Với **database mới**, kết nối đúng database rồi chạy lần lượt:
+
+1. `matchday_database/01_schema.sql`
+2. `matchday_database/02_seed.sql`
+3. `matchday_database/03_verify.sql`
+
+Đọc thêm hướng dẫn trong `matchday_database/README_VI.md`.
+
+`02_seed_existing_users.sql` phục vụ trường hợp đã có dữ liệu người dùng. Không tự động chạy cả hai phương án seed trên cùng database.
+
+Không chạy lại script tạo schema trên database có dữ liệu quan trọng khi chưa xem nội dung và sao lưu.
+
+### 6.4. Cài đặt backend
+
+Từ thư mục gốc repository:
+
+```bash
+cd Backend
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.example .env
 ```
 
-Chọn **Open with Live Server**.
+Chỉnh `Backend/.env` theo `.env.example`:
 
-### Bước 3: Đăng nhập demo
+- Thông tin kết nối PostgreSQL trên máy.
+- Tên database.
+- Khóa ký JWT.
+- Các cấu hình liên quan được ứng dụng yêu cầu.
 
-```text
-Email: demo@matchday.local
-Mật khẩu: Matchday123!
+Không đưa file `.env` chứa thông tin thật lên GitHub.
+
+### 6.5. Khởi động backend
+
+Trong thư mục `Backend`:
+
+```bash
+source .venv/bin/activate
+python -m uvicorn app.main:app --reload \
+    --host 127.0.0.1 --port 8000
 ```
 
-### Bước 4: Thử luồng chính
+Tài liệu Swagger:
 
-```text
-Đăng nhập
-→ Chọn đề mẫu hoặc tạo đề cá nhân
-→ Bắt đầu làm bài
-→ Nộp bài hoặc hết giờ
-→ Xem kết quả và lời giải
-→ Xem lịch sử, so sánh các lượt
+[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+Giữ terminal này chạy.
+
+### 6.6. Khởi động frontend
+
+Mở terminal khác, chuyển tới thư mục `Frontend`:
+
+```bash
+cd /path/to/Web-based-Mock-Examination-System/Frontend
+python3 -m http.server 5500 --bind 127.0.0.1
 ```
 
-Có thể tải file `Frontend/data/de-toan.json` để thử đề có công thức và lời giải.
+Thay `/path/to` bằng đường dẫn repository trên máy.
 
-## 7. Lưu trữ và giới hạn hiện tại
+Mở:
 
-- Dữ liệu hiện được lưu trong trình duyệt trên thiết bị đang dùng.
-- Giữ nguyên địa chỉ và cổng chạy để truy cập dữ liệu cũ.
-- Xóa dữ liệu website có thể làm mất đề và lịch sử.
-- Chưa đồng bộ dữ liệu giữa thiết bị hoặc trình duyệt.
-- Dung lượng lưu trữ phụ thuộc trình duyệt; giao diện thông báo khi lưu thất bại.
-- Đăng nhập demo và kiểm tra trên FE không thay thế xác thực, phân quyền trên máy chủ.
-- Chấm điểm hiện thực hiện tại trình duyệt; chưa phù hợp để sử dụng như hệ thống thi chính thức.
+[http://127.0.0.1:5500/](http://127.0.0.1:5500/)
 
-## 8. Lộ trình
+Đảm bảo frontend sử dụng chế độ API và địa chỉ backend local. Backend cần cho phép origin `http://127.0.0.1:5500` trong cấu hình CORS.
 
-### Frontend MVP
+Dùng nhất quán `127.0.0.1` thay vì đổi qua lại với `localhost`, vì đây là các origin khác nhau đối với trình duyệt.
 
-- [x] Giao diện dành cho học sinh.
-- [x] Đăng nhập và đăng xuất demo.
-- [x] Đề mẫu và quản lý đề cá nhân.
-- [x] Tạo, chỉnh sửa, xóa đề và quản lý phiên bản.
-- [x] Hiển thị công thức và lời giải.
-- [x] Làm bài có giới hạn thời gian và khôi phục tiến độ.
-- [x] Kết quả, lịch sử và so sánh lượt thi.
-- [x] Nhật ký rời trang để tự đánh giá sự tập trung.
-- [x] Kiểm tra các luồng chính và giao diện bằng Chromium ở độ rộng 320, 390 và 1440 px.
+### 6.7. Tài khoản kiểm thử
 
-### Backend và tích hợp
+| Tài khoản | Mật khẩu / cách sử dụng |
+| --- | --- |
+| `demo@matchday.local` | `MatchdayDemo!2026`, nếu đã nạp dữ liệu demo tương ứng |
+| `user@example.com` | Dùng mật khẩu đã tạo trong database local |
+| Tài khoản mới | Đăng ký qua giao diện |
 
-- [ ] Đăng ký, đăng nhập, đăng xuất thật.
-- [ ] Khôi phục mật khẩu qua email và OTP.
-- [ ] Lưu hồ sơ, đề và kết quả theo từng tài khoản.
-- [ ] Kiểm tra quyền sở hữu và quyền truy cập trên máy chủ.
-- [ ] API quản lý đề và phiên bản đề.
-- [ ] Quản lý lượt thi, hạn giờ và chấm điểm trên máy chủ.
-- [ ] Chỉ cung cấp đáp án/lời giải sau khi lượt thi kết thúc.
-- [ ] Kết nối frontend với backend.
-- [ ] Kiểm thử tích hợp và triển khai.
+Không dùng mật khẩu demo cũ `Matchday123!` của chế độ frontend mô phỏng cho tài khoản database.
 
-### Hướng mở rộng sau MVP
+Tài khoản được tạo thủ công trên một máy sẽ không tự xuất hiện khi người khác clone repository. Có thể đăng ký tài khoản mới nếu dữ liệu seed không chứa tài khoản cần dùng.
 
-- Hỗ trợ thêm định dạng tài liệu.
-- Biểu đồ tiến bộ và phân tích theo chủ đề.
-- Thống kê các câu thường làm sai.
-- Phân tích phổ điểm, tứ phân vị và percentile khi có nhóm tham chiếu phù hợp.
+## 7. API chính
 
-Báo cáo phân tích phải nêu rõ nhóm dữ liệu so sánh. Không suy rộng thành thứ hạng toàn quốc.
+Các endpoint dùng tiền tố `/api/v1`.
 
-Đối chiếu điểm chuẩn đại học, nếu được bổ sung, phải có nguồn và năm công bố rõ ràng; chỉ mang tính tham khảo.
+| Method | Endpoint | Chức năng |
+| --- | --- | --- |
+| POST | `/register` | Đăng ký |
+| POST | `/token` | Kiểm tra thông tin đăng nhập và cấp token |
+| GET | `/me` | Lấy tài khoản hiện tại |
+| GET | `/profile` | Lấy hồ sơ |
+| PATCH | `/profile` | Cập nhật hồ sơ |
+| GET | `/exams?scope=sample` | Danh sách đề mẫu |
+| GET | `/exams?scope=mine` | Danh sách đề cá nhân |
+| POST | `/exams` | Tạo đề |
+| PUT | `/exams/{exam_id}` | Cập nhật thông qua phiên bản mới |
+| DELETE | `/exams/{exam_id}` | Xóa mềm đề cá nhân |
+| POST | `/attempts` | Bắt đầu hoặc khôi phục lượt thi |
+| GET | `/attempts` | Lịch sử hoàn thành |
+| GET | `/attempts/{attempt_id}` | Trạng thái và đáp án đã lưu |
+| PATCH | `/attempts/{attempt_id}` | Đồng bộ đáp án |
+| POST | `/attempts/{attempt_id}/submit` | Nộp bài |
+| GET | `/attempts/{attempt_id}/report` | Báo cáo kết quả |
+| POST | `/attempts/{attempt_id}/leave-events` | Ghi nhận sự kiện rời trang |
 
-## 9. Thành viên
+Xem Swagger để biết đầy đủ request, response và các endpoint bổ sung.
 
-- **Đào Hương Giang**
-- **Đoàn Công Tân**
+Lưu ý:
+
+- `/token` nhận form đăng nhập; trường `username` mang giá trị email.
+- Endpoint được bảo vệ yêu cầu `Authorization: Bearer <token>`.
+- Backend kiểm tra quyền sở hữu tài nguyên.
+- API câu hỏi cho lượt đang làm không trả đáp án đúng hoặc lời giải.
+- API chỉnh sửa đề thuộc sở hữu và API báo cáo hoàn thành có mục đích khác, nên có thể trả các thông tin này.
+
+## 8. Lưu trữ và tính nhất quán
+
+### PostgreSQL
+
+Lưu dữ liệu lâu dài:
+
+- Tài khoản và hồ sơ.
+- Đề, phiên bản và câu hỏi.
+- Lượt thi và đáp án.
+- Sự kiện rời trang.
+- Trạng thái hoàn thành, điểm và thống kê.
+
+### Trình duyệt
+
+Giữ phiên đăng nhập và bản nháp tạm thời phục vụ giao diện, đồng bộ và khôi phục trong cùng tab.
+
+Xóa dữ liệu trình duyệt có thể làm mất phiên hoặc thay đổi chưa đồng bộ, nhưng không tự xóa các kết quả đã lưu trong PostgreSQL.
+
+### Kiểm soát dữ liệu
+
+- Khóa ngoại và check constraints kiểm tra quan hệ và giá trị.
+- Phiên bản đề đã xuất bản được bảo vệ khỏi thay đổi.
+- Các lượt thi tham chiếu phiên bản cụ thể.
+- Lưu đáp án sử dụng phiên bản đồng bộ để phát hiện cập nhật cũ.
+- Database kiểm soát chấm điểm và trạng thái cuối cùng.
+- Lượt đã hoàn tất được bảo vệ khỏi chỉnh sửa.
+
+Khả năng tiếp tục trên trình duyệt hoặc thiết bị khác vẫn phụ thuộc phiên đăng nhập và luồng khôi phục; không nên coi đây là chế độ đồng bộ đa thiết bị đã được kiểm thử đầy đủ.
+
+## 9. Kiểm thử
+
+Luồng kiểm thử local chính:
+
+1. Đăng ký hoặc đăng nhập.
+2. Mở trang cá nhân và cập nhật hồ sơ.
+3. Tạo hoặc nhập đề JSON.
+4. Kiểm tra bản xem trước và lưu đề.
+5. Chọn đúng đề cá nhân để bắt đầu.
+6. Trả lời, đánh dấu và chờ đồng bộ.
+7. Tải lại cùng tab để kiểm tra khôi phục và hạn giờ.
+8. Nộp bài và kiểm tra thống kê.
+9. Mở lại kết quả từ lịch sử bằng `attemptId`.
+10. Kiểm tra tài khoản khác không truy cập được báo cáo.
+11. Kiểm tra giao diện trên màn hình nhỏ.
+
+### Lighthouse
+
+Một lần đo trang chủ local bằng Chrome DevTools với cấu hình mobile ghi nhận:
+
+| Hạng mục | Điểm / 100 |
+| --- | --- |
+| Performance | 100 |
+| Accessibility | 100 |
+| Best Practices | 96 |
+| SEO | 90 |
+
+Các điểm số áp dụng cho trang chủ trong lần đo đó, không đại diện cho mọi trang hoặc hiệu năng backend. Điểm Accessibility 100 không đồng nghĩa đã xác minh đầy đủ khả năng tiếp cận.
+
+## 10. Hạn chế và lỗi đã biết
+
+- Khôi phục mật khẩu/email OTP chưa hoàn tất do lỗi xác thực SMTP.
+- Chỉ hỗ trợ nhập JSON và câu hỏi trắc nghiệm bốn lựa chọn.
+- Chưa hỗ trợ PDF, Word, OCR hoặc chấm tự luận.
+- Bảng so sánh trên màn hình nhỏ cần kiểm tra thêm khả năng truy cập các cột ngoài viewport.
+- Chưa có bằng chứng kiểm thử tải lớn hoặc mất mạng kéo dài.
+- Bản nháp chưa đồng bộ có thể mất khi đóng tab hoặc xóa dữ liệu trình duyệt.
+- Việc ghi nhận rời trang không phải cơ chế giám sát thi chính thức.
+
+### Lỗi xử lý xung đột đồng bộ
+
+Trong `Backend/app/routers/attempts.py`, ở `save_exam` và `submit_exam`, handler `psycopg.OperationalError` đang đứng trước `psycopg.errors.SerializationFailure`.
+
+Do quan hệ kế thừa của hai exception, xung đột đồng bộ có thể bị trả thành HTTP `503` thay vì `409`.
+
+**Trạng thái: đã ghi nhận, chưa sửa.** Cần đổi thứ tự handler và kiểm thử lại trước khi đánh dấu hoàn tất.
+
+## 11. Hướng phát triển
+
+- Sửa lỗi ánh xạ exception khi xung đột đồng bộ.
+- Bổ sung regression test cho lưu đáp án và nộp bài.
+- Mở rộng kiểm thử quyền sở hữu, hạn giờ và nộp lặp.
+- Hoàn thiện khôi phục mật khẩu sau khi xử lý email delivery.
+- Cải thiện bảng so sánh và điều hướng bàn phím trên màn hình nhỏ.
+- Kiểm tra accessibility và Lighthouse trên các trang chính khác.
+- Cân nhắc chuyển đổi PDF/Word với bước kiểm tra nội dung trước khi lưu.
+- Bổ sung phân tích tiến bộ khi có dữ liệu và nhóm tham chiếu phù hợp.
+
+Triển khai công khai không thuộc yêu cầu của phiên bản nộp bài hiện tại.
+
+## 12. Thành viên
+
+| Thành viên | Phần việc chính |
+| --- | --- |
+| **Đào Hương Giang** | Frontend, backend API và tích hợp frontend–API |
+| **Đoàn Công Tân** | Thiết kế database, SQL functions/triggers và kết nối backend–database |
