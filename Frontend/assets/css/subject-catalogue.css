@@ -1,0 +1,147 @@
+.md-subject-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+    align-items: start;
+}
+
+.md-subject-sidebar {
+    background: #fff;
+    border: 1px solid #dce1e9;
+    border-top: 3px solid #db0007;
+    padding: 18px;
+}
+
+.md-subject-sidebar h2 {
+    margin: 0 0 16px;
+    font-size: 20px;
+}
+
+.md-subject-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.md-subject-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid transparent;
+    background: #f5f6f8;
+    color: #1c2c5b;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+}
+
+.md-subject-button:hover {
+    border-color: #db0007;
+}
+
+.md-subject-button[aria-pressed="true"] {
+    background: #1c2c5b;
+    color: #fff;
+}
+
+.md-subject-button:focus-visible {
+    outline: 3px solid #db0007;
+    outline-offset: 2px;
+}
+
+.md-subject-count {
+    flex-shrink: 0;
+    font-size: 12px;
+}
+
+.md-subject-results {
+    min-width: 0;
+}
+
+.md-subject-results .exam-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.md-subject-label {
+    color: #66738b;
+    font-size: 14px;
+}
+
+@media (max-width: 900px) {
+    .md-subject-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .md-subject-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .md-subject-button {
+        width: auto;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .md-subject-results .exam-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Theme đỏ cho trang Đề mẫu và Đề của tôi */
+.md-catalogue-page .primary-button,
+.md-exams-page .primary-button {
+    background: #db0007;
+    border: 1px solid #db0007;
+    color: #fff;
+    border-radius: 3px;
+}
+
+.md-catalogue-page .primary-button:hover,
+.md-exams-page .primary-button:hover {
+    background: #b80006;
+    border-color: #b80006;
+    color: #fff;
+}
+
+.md-catalogue-page .secondary-button,
+.md-exams-page .secondary-button {
+    background: #fff;
+    border: 1px solid #db0007;
+    color: #db0007;
+    border-radius: 3px;
+}
+
+.md-catalogue-page .secondary-button:hover,
+.md-exams-page .secondary-button:hover {
+    background: #fff1f2;
+    color: #b80006;
+}
+
+.md-subject-button[aria-pressed="true"] {
+    background: #db0007;
+    border-color: #db0007;
+    color: #fff;
+}
+
+.md-subject-button:hover:not([aria-pressed="true"]) {
+    background: #fff1f2;
+    border-color: #db0007;
+    color: #db0007;
+}
+
+.md-subject-results .exam-card {
+    border-radius: 3px;
+    border-top: 3px solid #db0007;
+}
+
+.md-catalogue-page .md-eyebrow,
+.md-exams-page .md-eyebrow {
+    color: #db0007;
+}

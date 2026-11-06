@@ -47,11 +47,18 @@ class ExamCreate(BaseModel):
         ge=1,
         le=180,
     )
+
+    subjectId: int | None = Field(
+        default=None,
+        strict=True,
+        ge=1,
+        le=32767,
+    )
     questions: list[QuestionCreate] = Field(
         min_length=1,
         max_length=100,
-    ) 
-    
+    )
+
 class QuestionForAttempt(BaseModel):
     model_config = ConfigDict(extra="ignore")
 

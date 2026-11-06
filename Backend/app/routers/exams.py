@@ -1,38 +1,133 @@
+import json
 from typing import Literal
+from uuid import UUID
 
 import psycopg
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Response, status
+from pydantic import Field
 from psycopg.types.json import Jsonb
 
 from app.database import get_connection
 from app.dependencies import TokenUserId
 from app.schemas.exam import ExamCreate
 
-from uuid import UUID
-
-from pydantic import Field
-
-import json
-
-from fastapi import Response
 
 router = APIRouter(prefix="/api/v1/exams", tags=["Exams"])
+
+
+class ExamUpdate(ExamCreate):
+    expectedVersion: int = Field(strict=True, ge=1)
 
 
 def require_active_user(cursor, user_id: int):
     cursor.execute(
         """
-        SELECT id FROM public.users
+        SELECT id
+        FROM public.users
         WHERE id = %s AND is_active = true
         """,
         (user_id,),
     )
+
     if cursor.fetchone() is None:
         raise HTTPException(
             status_code=401,
             detail="Tài khoản không tồn tại hoặc đã bị vô hiệu hóa.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+def require_accessible_subject(cursor, subject_id, user_id):
+    if subject_id is None:
+        return
+
+    cursor.execute(
+        """
+        SELECT id
+        FROM public.subjects
+        WHERE id = %s
+          AND (owner_id IS NULL OR owner_id = %s)
+        """,
+        (subject_id, user_id),
+    )
+
+    if cursor.fetchone() is None:
+        raise HTTPException(
+            status_code=422,
+            detail="Môn học không tồn tại hoặc bạn không được sử dụng.",
+        )
+
+
+def require_owned_exam(cursor, exam_id, user_id, *, lock=False):
+    query = """
+        SELECT id
+        FROM public.exams
+        WHERE id = %s
+          AND owner_id = %s
+          AND deleted_at IS NULL
+    """
+
+    if lock:
+        query += " FOR UPDATE"
+
+    cursor.execute(query, (exam_id, user_id))
+
+    if cursor.fetchone() is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Không tìm thấy đề của bạn.",
+        )
+
+
+def load_version_summary(cursor, version_id):
+    cursor.execute(
+        """
+        SELECT
+            e.id AS "examId",
+            e.subject_id AS "subjectId",
+            s.name AS "subjectName",
+            v.id AS "examVersionId",
+            v.version_no AS "examVersion",
+            v.title,
+            v.duration_minutes AS "durationMinutes"
+        FROM public.exam_versions v
+        JOIN public.exams e ON e.id = v.exam_id
+        LEFT JOIN public.subjects s ON s.id = e.subject_id
+        WHERE v.id = %s
+        """,
+        (version_id,),
+    )
+    return cursor.fetchone()
+
+
+def create_version(cursor, exam_id, user_id, expected_version, payload):
+    questions = [
+        question.model_dump(exclude_none=True)
+        for question in payload.questions
+    ]
+
+    cursor.execute(
+        """
+        SELECT public.create_exam_version(
+            %s::uuid,
+            %s::bigint,
+            %s::integer,
+            %s::text,
+            %s::integer,
+            %s::jsonb
+        ) AS id
+        """,
+        (
+            exam_id,
+            user_id,
+            expected_version,
+            payload.title,
+            payload.durationMinutes,
+            Jsonb(questions),
+        ),
+    )
+
+    return cursor.fetchone()["id"]
 
 
 @router.get("")
@@ -49,6 +144,8 @@ def list_exams(
                     """
                     SELECT
                         e.id AS "examId",
+                        e.subject_id AS "subjectId",
+                        s.name AS "subjectName",
                         v.id AS "examVersionId",
                         v.version_no AS "examVersion",
                         v.title,
@@ -59,8 +156,10 @@ def list_exams(
                             WHERE q.exam_version_id = v.id
                         ) AS "questionCount"
                     FROM public.exams e
+                    LEFT JOIN public.subjects s
+                      ON s.id = e.subject_id
                     JOIN LATERAL (
-                        SELECT *
+                        SELECT id, version_no, title, duration_minutes
                         FROM public.exam_versions
                         WHERE exam_id = e.id
                           AND published_at IS NOT NULL
@@ -77,6 +176,7 @@ def list_exams(
                     """,
                     (scope, scope, user_id),
                 )
+
                 return cursor.fetchall()
 
     except psycopg.OperationalError:
@@ -88,74 +188,61 @@ def list_exams(
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_exam(payload: ExamCreate, user_id: TokenUserId):
-    # Bỏ explanation nếu là None vì hàm SQL yêu cầu
-    # explanation phải là chuỗi khi trường này xuất hiện.
-    questions = [
-        question.model_dump(exclude_none=True)
-        for question in payload.questions
-    ]
-
     try:
         with get_connection() as connection:
             with connection.cursor() as cursor:
                 require_active_user(cursor, user_id)
+                require_accessible_subject(
+                    cursor,
+                    payload.subjectId,
+                    user_id,
+                )
 
                 cursor.execute(
                     """
-                    INSERT INTO public.exams (owner_id)
-                    VALUES (%s)
+                    INSERT INTO public.exams (owner_id, subject_id)
+                    VALUES (%s, %s)
                     RETURNING id
                     """,
-                    (user_id,),
+                    (user_id, payload.subjectId),
                 )
                 exam_id = cursor.fetchone()["id"]
 
-                cursor.execute(
-                    """
-                    SELECT public.create_exam_version(
-                        %s::uuid,
-                        %s::bigint,
-                        0::integer,
-                        %s::text,
-                        %s::integer,
-                        %s::jsonb
-                    ) AS id
-                    """,
-                    (
-                        exam_id,
-                        user_id,
-                        payload.title,
-                        payload.durationMinutes,
-                        Jsonb(questions),
-                    ),
+                version_id = create_version(
+                    cursor,
+                    exam_id,
+                    user_id,
+                    0,
+                    payload,
                 )
-                version_id = cursor.fetchone()["id"]
 
-                cursor.execute(
-                    """
-                    SELECT
-                        exam_id AS "examId",
-                        id AS "examVersionId",
-                        version_no AS "examVersion",
-                        title,
-                        duration_minutes AS "durationMinutes"
-                    FROM public.exam_versions
-                    WHERE id = %s
-                    """,
-                    (version_id,),
-                )
-                result = cursor.fetchone()
+                result = load_version_summary(cursor, version_id)
+
+        return result
+
+    except psycopg.errors.SerializationFailure:
+        raise HTTPException(
+            status_code=409,
+            detail="Dữ liệu đã thay đổi. Hãy thử lại.",
+        ) from None
+
+    except psycopg.errors.RaiseException:
+        raise HTTPException(
+            status_code=409,
+            detail="Không thể tạo đề với dữ liệu hiện tại.",
+        ) from None
+
+    except psycopg.IntegrityError:
+        raise HTTPException(
+            status_code=422,
+            detail="Dữ liệu đề hoặc môn học không hợp lệ.",
+        ) from None
 
     except psycopg.OperationalError:
         raise HTTPException(
             status_code=503,
             detail="Không kết nối được database.",
         ) from None
-
-    return result
-
-class ExamUpdate(ExamCreate):
-    expectedVersion: int = Field(strict=True, ge=1)
 
 
 @router.put("/{exam_id}")
@@ -164,90 +251,76 @@ def update_exam(
     payload: ExamUpdate,
     user_id: TokenUserId,
 ):
-    questions = [
-        question.model_dump(exclude_none=True)
-        for question in payload.questions
-    ]
-
     try:
         with get_connection() as connection:
             with connection.cursor() as cursor:
                 require_active_user(cursor, user_id)
-
-                cursor.execute(
-                    """
-                    SELECT id
-                    FROM public.exams
-                    WHERE id = %s
-                      AND owner_id = %s
-                      AND deleted_at IS NULL
-                    FOR UPDATE
-                    """,
-                    (exam_id, user_id),
+                require_owned_exam(
+                    cursor,
+                    exam_id,
+                    user_id,
+                    lock=True,
                 )
-                if cursor.fetchone() is None:
-                    raise HTTPException(
-                        status_code=404,
-                        detail="Không tìm thấy đề của bạn.",
+
+                # Không gửi subjectId: giữ nguyên môn hiện tại.
+                # Gửi subjectId = null: bỏ phân loại.
+                if "subjectId" in payload.model_fields_set:
+                    require_accessible_subject(
+                        cursor,
+                        payload.subjectId,
+                        user_id,
                     )
 
-                cursor.execute(
-                    """
-                    SELECT public.create_exam_version(
-                        %s::uuid,
-                        %s::bigint,
-                        %s::integer,
-                        %s::text,
-                        %s::integer,
-                        %s::jsonb
-                    ) AS id
-                    """,
-                    (
-                        exam_id,
-                        user_id,
-                        payload.expectedVersion,
-                        payload.title,
-                        payload.durationMinutes,
-                        Jsonb(questions),
-                    ),
-                )
-                version_id = cursor.fetchone()["id"]
+                    cursor.execute(
+                        """
+                        UPDATE public.exams
+                        SET subject_id = %s
+                        WHERE id = %s AND owner_id = %s
+                        """,
+                        (payload.subjectId, exam_id, user_id),
+                    )
 
-                cursor.execute(
-                    """
-                    SELECT
-                        exam_id AS "examId",
-                        id AS "examVersionId",
-                        version_no AS "examVersion",
-                        title,
-                        duration_minutes AS "durationMinutes"
-                    FROM public.exam_versions
-                    WHERE id = %s
-                    """,
-                    (version_id,),
+                version_id = create_version(
+                    cursor,
+                    exam_id,
+                    user_id,
+                    payload.expectedVersion,
+                    payload,
                 )
-                result = cursor.fetchone()
+
+                result = load_version_summary(cursor, version_id)
+
+        return result
 
     except psycopg.errors.SerializationFailure:
         raise HTTPException(
             status_code=409,
             detail="Đề đã thay đổi. Hãy tải lại trước khi sửa.",
         ) from None
+
     except psycopg.errors.RaiseException:
         raise HTTPException(
             status_code=409,
             detail="Không thể tạo phiên bản mới với dữ liệu hiện tại.",
         ) from None
+
+    except psycopg.IntegrityError:
+        raise HTTPException(
+            status_code=422,
+            detail="Dữ liệu đề hoặc môn học không hợp lệ.",
+        ) from None
+
     except psycopg.OperationalError:
         raise HTTPException(
             status_code=503,
             detail="Không kết nối được database.",
         ) from None
 
-    return result
 
-
-@router.delete("/{exam_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{exam_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 def delete_exam(exam_id: UUID, user_id: TokenUserId):
     try:
         with get_connection() as connection:
@@ -265,11 +338,14 @@ def delete_exam(exam_id: UUID, user_id: TokenUserId):
                     """,
                     (exam_id, user_id),
                 )
+
                 if cursor.fetchone() is None:
                     raise HTTPException(
                         status_code=404,
                         detail="Không tìm thấy đề của bạn.",
                     )
+
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     except psycopg.OperationalError:
         raise HTTPException(
@@ -277,18 +353,20 @@ def delete_exam(exam_id: UUID, user_id: TokenUserId):
             detail="Không kết nối được database.",
         ) from None
 
-    return None
 
 def load_owned_exam(cursor, exam_id: UUID, user_id: int):
     cursor.execute(
         """
         SELECT
             e.id AS "examId",
+            e.subject_id AS "subjectId",
+            s.name AS "subjectName",
             v.id AS "examVersionId",
             v.version_no AS "examVersion",
             v.title,
             v.duration_minutes AS "durationMinutes"
         FROM public.exams e
+        LEFT JOIN public.subjects s ON s.id = e.subject_id
         JOIN LATERAL (
             SELECT id, version_no, title, duration_minutes
             FROM public.exam_versions
@@ -303,6 +381,7 @@ def load_owned_exam(cursor, exam_id: UUID, user_id: int):
         """,
         (exam_id, user_id),
     )
+
     exam = cursor.fetchone()
 
     if exam is None:
@@ -331,6 +410,7 @@ def load_owned_exam(cursor, exam_id: UUID, user_id: int):
         """,
         (exam["examVersionId"],),
     )
+
     exam["questions"] = cursor.fetchall()
     return exam
 
@@ -356,22 +436,7 @@ def list_exam_versions(exam_id: UUID, user_id: TokenUserId):
         with get_connection() as connection:
             with connection.cursor() as cursor:
                 require_active_user(cursor, user_id)
-
-                cursor.execute(
-                    """
-                    SELECT id
-                    FROM public.exams
-                    WHERE id = %s
-                      AND owner_id = %s
-                      AND deleted_at IS NULL
-                    """,
-                    (exam_id, user_id),
-                )
-                if cursor.fetchone() is None:
-                    raise HTTPException(
-                        status_code=404,
-                        detail="Không tìm thấy đề của bạn.",
-                    )
+                require_owned_exam(cursor, exam_id, user_id)
 
                 cursor.execute(
                     """
@@ -394,6 +459,7 @@ def list_exam_versions(exam_id: UUID, user_id: TokenUserId):
                     """,
                     (exam_id,),
                 )
+
                 return cursor.fetchall()
 
     except psycopg.OperationalError:
@@ -411,7 +477,9 @@ def download_owned_exam(exam_id: UUID, user_id: TokenUserId):
                 require_active_user(cursor, user_id)
                 exam = load_owned_exam(cursor, exam_id, user_id)
 
-                # Xuất đúng định dạng ExamCreate để có thể nhập lại.
+                # Giữ định dạng JSON hiện tại.
+                # Không xuất subjectId vì ID môn phụ thuộc database
+                # và có thể thuộc riêng một tài khoản.
                 export_data = ExamCreate.model_validate(
                     {
                         "title": exam["title"],
