@@ -15,7 +15,7 @@ Giao diện mang phong cách bóng đá với nhận diện MATCHDAY và màu đ
 ## 1. Mục tiêu và phạm vi
 
 - Cung cấp môi trường tự luyện thi trên máy tính và màn hình nhỏ.
-- Cho phép học sinh tạo, nhập JSON và chỉnh sửa đề cá nhân.
+- Cho phép học sinh tạo, nhập JSON, Word hoặc PDF và chỉnh sửa đề cá nhân.
 - Hiển thị câu hỏi, lựa chọn và lời giải có công thức toán học.
 - Đồng bộ đáp án và lưu kết quả theo tài khoản.
 - Xem lại các lượt thi và so sánh kết quả của cùng phiên bản đề.
@@ -29,7 +29,7 @@ Hệ thống tập trung vào **học sinh tự luyện tập**. Không có giao
 
 - Đăng ký tài khoản.
 - Đăng nhập bằng email và mật khẩu.
-- Băm mật khẩu và cấp JWT tại backend.
+- Băm mật khẩu và cấp JWT tại backend. Phiên mặc định kéo dài 3 giờ.
 - Kiểm tra phiên trước khi mở các trang được bảo vệ.
 - Đăng xuất bằng cách xóa phiên/token phía trình duyệt.
 - Cập nhật tên hiển thị và mục tiêu học tập.
@@ -37,12 +37,14 @@ Hệ thống tập trung vào **học sinh tự luyện tập**. Không có giao
 - Hiển thị số lượt đã hoàn thành, điểm trung bình và điểm cao nhất.
 - Hiển thị ba lượt hoàn thành gần nhất và liên kết xem lại.
 
-**Khôi phục mật khẩu qua email/OTP chưa hoàn thiện.** Phần này đang tạm dừng do lỗi xác thực SMTP và không thuộc luồng demo hoàn chỉnh.
+**Khôi phục mật khẩu qua email/OTP** cần script SQL 04 và SMTP đã cấu hình.
 
 ### 2.2. Đề mẫu và đề cá nhân
 
 - Chọn đề mẫu để luyện tập.
-- Nhập file JSON hoặc tạo đề trực tiếp.
+- Nhập JSON, Word (.docx), PDF hoặc tạo đề trực tiếp.
+- Nhận dạng PDF scan bằng OCR trên máy chạy backend.
+- Lưu và mở bản nháp trong trình duyệt.
 - Đặt tên và thời lượng.
 - Thêm, sửa và xóa câu hỏi.
 - Nhập bốn lựa chọn A–D và một đáp án đúng.
@@ -55,14 +57,15 @@ Hệ thống tập trung vào **học sinh tự luyện tập**. Không có giao
 
 | Nội dung | Giới hạn |
 | --- | --- |
-| Định dạng nhập file | JSON |
-| Kích thước file nhập | Tối đa 1 MB |
+| Định dạng nhập file | JSON, DOCX, PDF |
+| Kích thước file nhập | JSON: 1 MB; DOCX và PDF: 10 MB |
+| Số trang PDF | Tối đa 30 trang nếu có chữ; 5 trang nếu cần OCR |
 | Số câu hỏi | 1–100 câu |
 | Lựa chọn mỗi câu | Bốn lựa chọn A–D |
 | Đáp án đúng | Một đáp án mỗi câu |
 | Thời lượng | 1–180 phút |
 
-PDF, Word và nhận dạng nội dung từ ảnh chưa được hỗ trợ.
+Kiểm tra bản nháp trước khi lưu. Bảng đáp án PDF dạng `1.B 2.C` có thể được ghép theo số câu.
 
 ### 2.3. Công thức toán học
 
@@ -235,7 +238,9 @@ Với **database mới**, kết nối đúng database rồi chạy lần lượt
 
 1. `matchday_database/01_schema.sql`
 2. `matchday_database/02_seed.sql`
-3. `matchday_database/03_verify.sql`
+3. `matchday_database/04_password_reset.sql`
+4. `matchday_database/05_subject_categories.sql`
+5. `matchday_database/03_verify.sql` để kiểm tra schema và dữ liệu mẫu
 
 Đọc thêm hướng dẫn trong `matchday_database/README_VI.md`.
 
@@ -251,7 +256,7 @@ Từ thư mục gốc repository:
 cd Backend
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-lock.txt
 cp .env.example .env
 ```
 
@@ -262,7 +267,14 @@ Chỉnh `Backend/.env` theo `.env.example`:
 - Khóa ký JWT.
 - Các cấu hình liên quan được ứng dụng yêu cầu.
 
-Không đưa file `.env` chứa thông tin thật lên GitHub.
+Không đưa file `.env` chứa thông tin thật lên GitHub. Giữ `ACCESS_TOKEN_EXPIRE_MINUTES=180` cho phiên 3 giờ. Nếu dùng OTP, điền các biến SMTP và `OTP_SECRET`.
+
+Để nhập PDF scan trên macOS, cài công cụ OCR:
+
+    brew install poppler tesseract tesseract-lang
+    tesseract --list-langs
+
+Kiểm tra danh sách ngôn ngữ có `vie` và `eng`.
 
 ### 6.5. Khởi động backend
 
@@ -405,31 +417,22 @@ Các điểm số áp dụng cho trang chủ trong lần đo đó, không đại
 
 ## 10. Hạn chế và lỗi đã biết
 
-- Khôi phục mật khẩu/email OTP chưa hoàn tất do lỗi xác thực SMTP.
-- Chỉ hỗ trợ nhập JSON và câu hỏi trắc nghiệm bốn lựa chọn.
-- Chưa hỗ trợ PDF, Word, OCR hoặc chấm tự luận.
+- Khôi phục mật khẩu cần SMTP hoạt động.
+- Trình nhập hỗ trợ trắc nghiệm bốn lựa chọn. OCR có thể đọc sai công thức và không giữ hình, bảng hay đồ thị gốc.
+- Chưa hỗ trợ chấm tự luận.
 - Bảng so sánh trên màn hình nhỏ cần kiểm tra thêm khả năng truy cập các cột ngoài viewport.
 - Chưa có bằng chứng kiểm thử tải lớn hoặc mất mạng kéo dài.
-- Bản nháp chưa đồng bộ có thể mất khi đóng tab hoặc xóa dữ liệu trình duyệt.
+- Tiến độ làm bài chưa đồng bộ có thể mất khi đóng tab. Bản nháp đề có thể mất khi xóa dữ liệu trình duyệt.
 - Việc ghi nhận rời trang không phải cơ chế giám sát thi chính thức.
-
-### Lỗi xử lý xung đột đồng bộ
-
-Trong `Backend/app/routers/attempts.py`, ở `save_exam` và `submit_exam`, handler `psycopg.OperationalError` đang đứng trước `psycopg.errors.SerializationFailure`.
-
-Do quan hệ kế thừa của hai exception, xung đột đồng bộ có thể bị trả thành HTTP `503` thay vì `409`.
-
-**Trạng thái: đã ghi nhận, chưa sửa.** Cần đổi thứ tự handler và kiểm thử lại trước khi đánh dấu hoàn tất.
 
 ## 11. Hướng phát triển
 
-- Sửa lỗi ánh xạ exception khi xung đột đồng bộ.
 - Bổ sung regression test cho lưu đáp án và nộp bài.
 - Mở rộng kiểm thử quyền sở hữu, hạn giờ và nộp lặp.
-- Hoàn thiện khôi phục mật khẩu sau khi xử lý email delivery.
+- Kiểm thử gửi và nhận OTP trên môi trường bàn giao.
 - Cải thiện bảng so sánh và điều hướng bàn phím trên màn hình nhỏ.
 - Kiểm tra accessibility và Lighthouse trên các trang chính khác.
-- Cân nhắc chuyển đổi PDF/Word với bước kiểm tra nội dung trước khi lưu.
+- Cải thiện nhận dạng công thức và bố cục khi nhập PDF/Word.
 - Bổ sung phân tích tiến bộ khi có dữ liệu và nhóm tham chiếu phù hợp.
 
 Triển khai công khai không thuộc yêu cầu của phiên bản nộp bài hiện tại.
