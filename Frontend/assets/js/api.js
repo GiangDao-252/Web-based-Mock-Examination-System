@@ -19,10 +19,10 @@
 
         if (options.body instanceof FormData) {
             body = options.body;
-            // Trình duyệt tự đặt Content-Type kèm multipart boundary.
         } else if (options.body !== undefined) {
             if (options.form) {
                 body = new URLSearchParams(options.body);
+
                 headers.set(
                     "Content-Type",
                     "application/x-www-form-urlencoded"
@@ -33,8 +33,18 @@
             }
         }
 
+        const requestedTimeout = Number(options.timeoutMs ?? 15000);
+
+        const timeoutMs = Number.isFinite(requestedTimeout)
+            ? Math.min(Math.max(requestedTimeout, 1000), 180000)
+            : 15000;
+
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+        const timeoutId = setTimeout(
+            () => controller.abort(),
+            timeoutMs
+        );
 
         let response;
         let text;
@@ -48,16 +58,17 @@
             });
 
             text = await response.text();
-        } catch (cause) {
+        } catch {
             const timedOut = controller.signal.aborted;
 
             const error = new Error(
                 timedOut
-                    ? "Máy chủ phản hồi quá lâu. Vui lòng thử lại."
+                    ? "Máy chủ phản hồi quá lâu. Yêu cầu có thể vẫn đang được xử lý; đừng gửi lại liên tục."
                     : "Không kết nối được máy chủ. Kiểm tra mạng hoặc thử lại sau."
             );
 
             error.code = timedOut ? "TIMEOUT" : "NETWORK_ERROR";
+
             throw error;
         } finally {
             clearTimeout(timeoutId);
@@ -72,7 +83,9 @@
                 const error = new Error(
                     "Máy chủ trả về phản hồi không đúng định dạng JSON."
                 );
+
                 error.status = response.status;
+
                 throw error;
             }
         }
@@ -88,12 +101,22 @@
                         ? item.loc.join(".")
                         : "";
 
-                    return location + ": " + item.msg;
+                    return (
+                        (location ? location + ": " : "") +
+                        (item.msg || "Dữ liệu không hợp lệ.")
+                    );
                 }).join("; ");
             }
 
             const error = new Error(detail);
+
             error.status = response.status;
+            error.code = data?.code || null;
+
+            const retryAfter = response.headers.get("Retry-After");
+
+            error.retryAfter = retryAfter || null;
+
             throw error;
         }
 
@@ -116,6 +139,7 @@
         }
 
         sessionStorage.setItem(key, result.access_token);
+
         return result;
     }
 

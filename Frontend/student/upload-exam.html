@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#DB0007">
-
     <title>Tải đề thi | MATCHDAY</title>
 
     <script src="../assets/js/api-config.js"></script>
@@ -22,39 +21,25 @@
     <script src="../assets/js/exam-store.js" defer></script>
     <script src="../assets/js/math-render.js" defer></script>
     <script src="../assets/vendor/mathjax/tex-svg.js" defer></script>
-    <script src="../assets/js/upload-exam.js?v=5" defer></script>
+    <script src="../assets/js/upload-exam.js?v=10" defer></script>
     <script src="../assets/js/matchday.js" defer></script>
 </head>
-
 <body class="dashboard-page matchday-page md-upload-page">
     <a class="md-skip" href="#main-content">Đến nội dung chính</a>
 
     <header class="md-header">
         <div class="container md-header-inner">
-            <a
-                class="md-brand"
-                href="../index.html"
-                aria-label="Matchday — Trang chủ"
-            >
-                <span class="md-brand-mark" aria-hidden="true">
-                    M<span>★</span>
-                </span>
-                <span>
-                    MATCHDAY
-                    <small>THI THỬ TRỰC TUYẾN</small>
-                </span>
+            <a class="md-brand" href="../index.html" aria-label="Matchday — Trang chủ">
+                <span class="md-brand-mark" aria-hidden="true">M<span>★</span></span>
+                <span>MATCHDAY <small>THI THỬ TRỰC TUYẾN</small></span>
             </a>
-
             <nav class="md-nav" aria-label="Điều hướng chính">
                 <a href="../index.html">Trang chủ</a>
                 <a href="profile.html">Trang cá nhân</a>
                 <a href="exams.html">Đề mẫu</a>
                 <a href="my-exams.html">Đề của tôi</a>
-                <a href="upload-exam.html" aria-current="page">
-                    Tải đề thi
-                </a>
+                <a href="upload-exam.html" aria-current="page">Tải đề thi</a>
             </nav>
-
             <button class="md-account" type="button">
                 Đăng xuất <span aria-hidden="true">↗</span>
             </button>
@@ -68,189 +53,120 @@
     <main class="container student-main" id="main-content">
         <p class="md-eyebrow">TACTICS ROOM</p>
         <h1>Chuẩn bị đề. Sẵn sàng vào sân.</h1>
-
         <p class="dashboard-description">
-            Nhập đề từ file JSON hoặc tạo đề trực tiếp.
+            Nhập đề từ JSON, Word hoặc PDF, hoặc tạo đề trực tiếp.
             Kiểm tra nội dung trước khi lưu và bắt đầu luyện tập.
         </p>
-
-        <a class="secondary-button" href="my-exams.html">
-            Xem đề của tôi
-        </a>
+        <a class="secondary-button" href="my-exams.html">Xem đề của tôi</a>
 
         <section class="mvp-panel" aria-labelledby="import-title">
-            <h2 id="import-title">Nhập từ file JSON</h2>
-
+            <h2 id="import-title">Nhập từ JSON, Word hoặc PDF</h2>
             <p id="import-help">
-                Hỗ trợ file JSON tối đa 1 MB, từ 1 đến 100 câu
-                trắc nghiệm với bốn lựa chọn A–D.
-                PDF và Word chưa được hỗ trợ.
+                JSON tối đa 1 MB; Word (.docx) và PDF tối đa 10 MB.
+                Mỗi đề có từ 1 đến 100 câu, mỗi câu có bốn lựa chọn A–D.
             </p>
-
             <div class="mvp-field">
-                <label for="exam-file">File đề thi JSON</label>
-                <input
-                    type="file"
-                    id="exam-file"
-                    accept=".json,application/json"
-                    aria-describedby="import-help"
-                >
+                <label for="exam-file">File đề thi</label>
+                <input type="file" id="exam-file" accept=".json,.docx,.pdf"
+                       aria-describedby="import-help document-import-help scan-import-help">
             </div>
-
             <div class="mvp-actions">
-                <button
-                    type="button"
-                    class="secondary-button"
-                    id="import-exam"
-                >
+                <button type="button" class="secondary-button" id="import-exam">
                     Đọc file và chỉnh sửa
                 </button>
-
-                <a
-                    class="secondary-button"
-                    href="../data/de-toan.json"
-                    download
-                >
+                <a class="secondary-button" href="../data/de-toan.json" download>
                     Tải đề mẫu JSON ↓
                 </a>
-                </div>
-
-            <p class="mvp-hint">
-                Tải file mẫu để tham khảo cấu trúc câu hỏi, đáp án,
-                công thức và lời giải. Chức năng tải mẫu cần backend
-                đang chạy trên máy.
+            </div>
+            <p id="import-message" role="status"></p>
+            <p id="document-import-help" class="mvp-hint">
+                Với Word và PDF có chữ, nên trình bày câu hỏi theo dạng “Câu 1.”
+                và đặt các lựa chọn A., B., C., D. trên dòng riêng.
+                Có thể ghi thêm “Đáp án: B” và “Lời giải: …”.
             </p>
+            <p id="scan-import-help" class="mvp-hint">
+                PDF scan tối đa 5 trang và được nhận dạng chữ trên máy chủ.
+                Bảng đáp án cuối PDF dạng “1.B 2.C” được ghép theo số câu.
+                Hãy đối chiếu đáp án, công thức và nội dung với file gốc.
+            </p>
+            <p class="mvp-hint">
+                Có thể lưu nháp khi chưa đủ đáp án. Để lưu đề chính thức,
+                hãy nhập thời lượng và chọn đáp án đúng cho từng câu.
+            </p>
+            <div id="import-warnings" role="status" hidden></div>
         </section>
 
         <section class="mvp-panel" aria-labelledby="editor-title">
-            <h2 id="editor-title">Tạo và chỉnh sửa đề</h2>
-
-            <p
-                id="upload-message"
-                role="status"
-                aria-live="polite"
-            ></p>
-
+            <h2 id="editor-title" tabindex="-1">Tạo và chỉnh sửa đề</h2>
+            <p id="upload-message" role="status"></p>
             <p id="math-help" class="mvp-hint">
-                Công thức cùng dòng:
-                <code>\( \frac{1}{2} \)</code>.
-                Công thức riêng dòng:
-                <code>\[ \int_0^1 x^2\,dx \]</code>.
+                Công thức cùng dòng: <code>\( \frac{1}{2} \)</code>.
+                Công thức riêng dòng: <code>\[ \int_0^1 x^2\,dx \]</code>.
                 Nhấn “Xem trước” để kiểm tra công thức.
-                Mỗi câu có số điểm bằng nhau; câu sai và bỏ trống
-                không được tính điểm.
+                Mỗi câu có số điểm bằng nhau; câu sai và bỏ trống không được tính điểm.
             </p>
 
             <form id="exam-editor-form" aria-describedby="math-help">
                 <div class="mvp-grid">
                     <div class="mvp-field">
-                        <label for="exam-title-input">
-                            Tên bài thi
-                        </label>
-                        <input
-                            id="exam-title-input"
-                            name="title"
-                            type="text"
-                            maxlength="120"
-                            required
-                        >
+                        <label for="exam-title-input">Tên bài thi</label>
+                        <input id="exam-title-input" name="title"
+                               type="text" maxlength="120" required>
                     </div>
-
                     <div class="mvp-field">
-                        <label for="exam-duration-input">
-                            Thời lượng (phút)
-                        </label>
-                        <input
-                            id="exam-duration-input"
-                            name="durationMinutes"
-                            type="number"
-                            min="1"
-                            max="180"
-                            step="1"
-                            value="60"
-                            required
-                        >
+                        <label for="exam-duration-input">Thời lượng (phút)</label>
+                        <input id="exam-duration-input" name="durationMinutes"
+                               type="number" min="1" max="180" step="1" value="60" required>
                     </div>
                 </div>
 
                 <section class="mvp-panel" aria-labelledby="subject-title">
                     <h3 id="subject-title">Môn học</h3>
-
                     <div class="mvp-field">
                         <label for="exam-subject-input">Chọn môn</label>
-                        <select id="exam-subject-input" disabled>
+                        <select id="exam-subject-input" name="subjectId"
+                                aria-describedby="subject-help" disabled>
                             <option value="">Đang tải môn học…</option>
                         </select>
+                        <p id="subject-help" class="mvp-hint">
+                            Nếu chưa chọn môn, đề sẽ nằm trong nhóm “Chưa phân loại”.
+                        </p>
                     </div>
-
                     <div class="mvp-field">
-                        <label for="new-subject-input">
-                            Thêm môn chưa có trong danh sách
-                        </label>
-                        <input
-                            id="new-subject-input"
-                            type="text"
-                            maxlength="100"
-                            placeholder="Ví dụ: Xác suất thống kê"
-                        >
+                        <label for="new-subject-input">Thêm môn chưa có trong danh sách</label>
+                        <input id="new-subject-input" type="text" maxlength="100"
+                               placeholder="Ví dụ: Xác suất thống kê">
                     </div>
-
-                    <button
-                        id="add-subject"
-                        class="secondary-button"
-                        type="button"
-                        disabled
-                    >
+                    <button id="add-subject" class="secondary-button" type="button" disabled>
                         Thêm môn
                     </button>
-
-                    <p id="subject-message" role="status" aria-live="polite"></p>
+                    <p id="subject-message" role="status"></p>
                 </section>
 
                 <div id="question-editor"></div>
 
                 <div class="mvp-actions">
-                    <button
-                        type="button"
-                        id="add-question"
-                        class="secondary-button"
-                    >
+                    <button type="button" id="add-question" class="secondary-button">
                         Thêm câu hỏi
                     </button>
-
-                    <button
-                        type="button"
-                        id="preview-exam"
-                        class="secondary-button"
-                    >
+                    <button type="button" id="preview-exam" class="secondary-button">
                         Xem trước
                     </button>
-
-                    <button
-                        type="submit"
-                        id="save-exam"
-                        class="primary-button"
-                    >
+                    <button type="button" id="save-exam-draft" class="secondary-button">
+                        Lưu nháp
+                    </button>
+                    <button type="button" id="restore-exam-draft" class="secondary-button">
+                        Mở bản nháp
+                    </button>
+                    <button type="submit" id="save-exam" class="primary-button">
                         Lưu đề
                     </button>
-
-                    <a
-                        id="saved-exam-link"
-                        class="secondary-button"
-                        hidden
-                    >
-                        Vào luyện tập →
-                    </a>
+                    <a id="saved-exam-link" class="secondary-button" hidden>Vào luyện tập →</a>
                 </div>
             </form>
         </section>
 
-        <section
-            id="exam-preview"
-            class="mvp-panel"
-            aria-labelledby="preview-title"
-            hidden
-        >
+        <section id="exam-preview" class="mvp-panel" aria-labelledby="preview-title" hidden>
             <h2 id="preview-title">Xem trước đề</h2>
             <p id="preview-summary"></p>
             <p id="math-status" role="status"></p>
