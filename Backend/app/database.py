@@ -11,6 +11,15 @@ load_dotenv(ENV_FILE)
 
 
 def get_connection():
+    database_url = os.getenv("DATABASE_URL")
+
+    if database_url:
+        return psycopg.connect(
+            database_url,
+            connect_timeout=15,
+            row_factory=dict_row,
+        )
+
     required = (
         "DB_HOST",
         "DB_PORT",
@@ -35,6 +44,6 @@ def get_connection():
         dbname=os.environ["DB_NAME"],
         user=os.environ["DB_USER"],
         password=os.environ["DB_PASSWORD"],
-        connect_timeout=5,
+        connect_timeout=15,
         row_factory=dict_row,
     )
