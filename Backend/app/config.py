@@ -19,8 +19,6 @@ class Settings(BaseSettings):
         le=180,
     )
 
-    gemini_api_key: SecretStr | None = None
-
     model_config = SettingsConfigDict(
         env_file=BACKEND_DIR / ".env",
         env_file_encoding="utf-8",

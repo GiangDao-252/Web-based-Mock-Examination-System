@@ -193,16 +193,16 @@ def save_exam(
                     "answeredQuestions": attempt["answered_count"],
                 }
 
-    except psycopg.OperationalError:
-        raise HTTPException(
-            status_code=503,
-            detail="Không kết nối được database.",
-        ) from None
-
     except psycopg.errors.SerializationFailure:
         raise HTTPException(
             status_code=409,
             detail="Dữ liệu đã thay đổi. Tải lại trạng thái lượt làm.",
+        ) from None
+
+    except psycopg.OperationalError:
+        raise HTTPException(
+            status_code=503,
+            detail="Không kết nối được database.",
         ) from None
 
     except psycopg.errors.RaiseException:
@@ -285,16 +285,16 @@ def submit_exam(
                     "pageLeaveCount": attempt["page_leave_count"],
                 }
 
-    except psycopg.OperationalError:
-        raise HTTPException(
-            status_code=503,
-            detail="Không kết nối được database.",
-        ) from None
-
     except psycopg.errors.SerializationFailure:
         raise HTTPException(
             status_code=409,
             detail="Dữ liệu đã thay đổi. Tải lại trạng thái lượt làm.",
+        ) from None
+
+    except psycopg.OperationalError:
+        raise HTTPException(
+            status_code=503,
+            detail="Không kết nối được database.",
         ) from None
 
     except psycopg.errors.RaiseException as exc:
